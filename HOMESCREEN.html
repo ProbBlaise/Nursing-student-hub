@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rwanda Practical Logbook - Login & Registration</title>
+  <style>
+    :root {
+      --primary-blue: #00a3e0;
+      --accent-yellow: #fcd116;
+      --card-border-green: #28a745;
+      --teacher-purple: #6f42c1;
+      --supervisor-green: #208C44;
+      --bg-color: #f0f4f8;
+      --text-dark: #333;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-color);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .national-header {
+      background-color: var(--primary-blue);
+      color: white;
+      text-align: center;
+      padding: 25px 15px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      border-bottom: 5px solid var(--accent-yellow);
+    }
+
+    .national-header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .national-header p {
+      margin: 5px 0 0;
+      font-size: 0.95rem;
+      color: #e0f4fc;
+    }
+
+    .main-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 15px;
+    }
+
+    .role-switcher {
+      display: flex;
+      background: #e9ecef;
+      padding: 4px;
+      border-radius: 30px;
+      margin-bottom: 20px;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .role-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 10px 10px;
+      font-weight: bold;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.88rem;
+      color: #555;
+    }
+
+    .role-btn.active-student {
+      background: var(--primary-blue);
+      color: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .role-btn.active-teacher {
+      background: var(--teacher-purple);
+      color: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .role-btn.active-supervisor {
+      background: var(--supervisor-green);
+      color: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .toggle-buttons {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 25px;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .toggle-btn {
+      flex: 1;
+      padding: 12px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+    }
+
+    .toggle-btn.register {
+      background-color: white;
+      color: var(--primary-blue);
+      border: 2px solid var(--primary-blue);
+    }
+
+    .toggle-btn.login {
+      background-color: var(--primary-blue);
+      color: white;
+      border: 2px solid var(--primary-blue);
+    }
+
+    .card {
+      background: white;
+      width: 100%;
+      max-width: 500px;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      border-top: 4px solid var(--card-border-green);
+      box-sizing: border-box;
+    }
+
+    .card-title {
+      color: var(--primary-blue);
+      font-size: 1.25rem;
+      font-weight: bold;
+      margin: 0 0 20px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #e9ecef;
+      padding-bottom: 12px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+      color: #444;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #ced4da;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+      background-color: #fff;
+    }
+
+    select optgroup {
+      font-weight: bold;
+      color: var(--primary-blue);
+      background-color: #f8f9fa;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 3px rgba(0, 163, 224, 0.15);
+    }
+
+    .password-wrapper {
+      position: relative;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 1rem;
+      opacity: 0.6;
+    }
+
+    .passport-preview-container {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-top: 8px;
+    }
+
+    .passport-preview {
+      width: 80px;
+      height: 80px;
+      border-radius: 6px;
+      border: 2px dashed #ced4da;
+      object-fit: cover;
+      background-color: #f8f9fa;
+    }
+
+    .btn-action {
+      width: 100%;
+      background-color: var(--primary-blue);
+      color: white;
+      border: none;
+      padding: 14px;
+      font-size: 1.05rem;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-action.teacher-bg {
+      background-color: var(--teacher-purple) !important;
+    }
+
+    .btn-action.supervisor-bg {
+      background-color: var(--supervisor-green) !important;
+    }
+
+    .form-section {
+      display: none;
+    }
+
+    .form-section.active {
+      display: block;
+    }
+
+    .teacher-dashboard, .supervisor-dashboard {
+      display: none;
+      width: 100%;
+      max-width: 800px;
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      border-top: 5px solid var(--teacher-purple);
+      box-sizing: border-box;
+    }
+
+    .supervisor-dashboard {
+      border-top: 5px solid var(--supervisor-green);
+    }
+
+    .teacher-dashboard-header, .supervisor-dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .teacher-profile-wrapper, .supervisor-profile-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .teacher-avatar, .supervisor-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--teacher-purple);
+    }
+
+    .supervisor-avatar {
+      border: 3px solid var(--supervisor-green);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-edit-profile {
+      background-color: var(--teacher-purple);
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: opacity 0.2s ease;
+    }
+
+    .btn-edit-profile.sup-edit {
+      background-color: var(--supervisor-green);
+    }
+
+    .btn-edit-profile:hover {
+      opacity: 0.9;
+    }
+
+    .search-box-container {
+      margin-bottom: 20px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 0.95rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      transition: border-color 0.2s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--teacher-purple);
+      box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.15);
+    }
+
+    .search-input.sup-search:focus {
+      border-color: var(--supervisor-green);
+      box-shadow: 0 0 0 3px rgba(32, 140, 68, 0.15);
+    }
+
+    .student-card-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid #e2e8f0;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      background: #fdfdfd;
+    }
+
+    .student-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .student-info img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--primary-blue);
+    }
+
+    .btn-view-student {
+      background-color: var(--primary-blue);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .btn-assess-student {
+      background-color: var(--supervisor-green);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-card {
+      background: white;
+      width: 90%;
+      max-width: 450px;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .btn-cancel {
+      background: #6c757d;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="national-header">
+    <h1>RWANDA CLINICAL & TECHNICAL PRACTICAL LOGBOOK</h1>
+    <p>TVET & Professional Training Skills Tracking Portal</p>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <div class="main-container">
+
+    <!-- ROLE SWITCHER -->
+    <div id="roleSwitcher" class="role-switcher">
+      <button id="roleStudentBtn" class="role-btn active-student" onclick="setRole('student')">👨‍🎓 Student</button>
+      <button id="roleTeacherBtn" class="role-btn" onclick="setRole('teacher')">👨‍🏫 Teacher</button>
+      <button id="roleSupervisorBtn" class="role-btn" onclick="setRole('supervisor')">📋 Supervisor</button>
+    </div>
+    
+    <!-- TOGGLE BUTTONS (LOGIN / REGISTER) -->
+    <div id="authToggleContainer" class="toggle-buttons">
+      <button id="btnLogin" class="toggle-btn login" onclick="switchForm('login')">LOGIN</button>
+      <button id="btnRegister" class="toggle-btn register" onclick="switchForm('register')">REGISTER</button>
+    </div>
+
+    <!-- CARD CONTAINER FOR AUTH -->
+    <div id="authCard" class="card">
+
+      <!-- LOGIN FORM -->
+      <div id="loginSection" class="form-section active">
+        <div class="card-title" id="loginTitle">
+          <span>🔑</span> Student Login
+        </div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
+          <div class="form-group" id="loginCodeGroup">
+            <label for="loginCode">Student ID Code:</label>
+            <input type="text" id="loginCode" placeholder="e.g. 0000-0000-001" maxlength="14" oninput="formatStudentCode(this)">
+          </div>
+
+          <div class="form-group" id="teacherEmailGroup" style="display: none;">
+            <label for="loginTeacherEmail">Teacher ID / CAMIS Code:</label>
+            <input type="text" id="loginTeacherEmail" placeholder="e.g. T-9865 or CAMIS-102938">
+          </div>
+
+          <div class="form-group" id="supervisorEmailGroup" style="display: none;">
+            <label for="loginSupervisorEmail">Supervisor ID / Practice Institution Code:</label>
+            <input type="text" id="loginSupervisorEmail" placeholder="e.g. SUP-4021 or Gihara">
+          </div>
+
+          <div class="form-group" id="loginTradeGroup">
+            <label for="loginTradeSelect">Target Option / Trade:</label>
+            <select id="loginTradeSelect">
+              <option value="" selected>Select your trade (Optional)...</option>
+              <optgroup label="🏥 Health & Medical Sciences">
+                <option value="Associate Nursing">Associate Nursing</option>
+                <option value="Medical Laboratory Sciences">Medical Laboratory Sciences</option>
+                <option value="Dental Therapy & Oral Health">Dental Therapy & Oral Health</option>
+              </optgroup>
+              <optgroup label="💻 ICT & Digital Technologies">
+                <option value="Software Development">Software Development</option>
+                <option value="Computer Systems & Architecture">Computer Systems & Architecture</option>
+                <option value="Networking & Internet Technologies">Networking & Internet Technologies</option>
+                <option value="Multimedia Production">Multimedia Production</option>
+                <option value="Software Programming & Embedded Systems">Software Programming & Embedded Systems</option>
+              </optgroup>
+              <optgroup label="🏗️ Construction & Building Services">
+                <option value="Building Construction">Building Construction</option>
+                <option value="Civil Engineering & Public Works">Civil Engineering & Public Works</option>
+                <option value="Plumbing Technology">Plumbing Technology</option>
+                <option value="Land Surveying">Land Surveying</option>
+                <option value="Interior Design">Interior Design</option>
+              </optgroup>
+              <optgroup label="⚡ Energy & Electrical Engineering">
+                <option value="Electrical Technology">Electrical Technology</option>
+                <option value="Renewable Energy (Solar, Biomass, Hydro)">Renewable Energy (Solar, Biomass, Hydro)</option>
+                <option value="Electronics & Telecommunication">Electronics & Telecommunication</option>
+              </optgroup>
+              <optgroup label="🛠️ Manufacturing, Mechanical & Automotive">
+                <option value="Automobile Technology (Engine & Bodywork)">Automobile Technology (Engine & Bodywork)</option>
+                <option value="Heavy Machinery Maintenance">Heavy Machinery Maintenance</option>
+                <option value="Manufacturing Technology / Mechanical Production">Manufacturing Technology / Mechanical Production</option>
+                <option value="Welding & Fabrication">Welding & Fabrication</option>
+              </optgroup>
+              <optgroup label="🌿 Agriculture, Animal Resources & Food Processing">
+                <option value="General Agriculture & Crop Production">General Agriculture & Crop Production</option>
+                <option value="Animal Health & Veterinary Technology">Animal Health & Veterinary Technology</option>
+                <option value="Food Processing & Technology">Food Processing & Technology</option>
+                <option value="Forestry & Wood Technology">Forestry & Wood Technology</option>
+                <option value="Irrigation & Water Engineering">Irrigation & Water Engineering</option>
+              </optgroup>
+              <optgroup label="🏨 Hospitality, Tourism & Creative Arts">
+                <option value="Culinary Arts">Culinary Arts</option>
+                <option value="Food & Beverage Operations">Food & Beverage Operations</option>
+                <option value="Front Office & Housekeeping Operations">Front Office & Housekeeping Operations</option>
+                <option value="Tourism & Park Management">Tourism & Park Management</option>
+                <option value="Fashion Design & Tailoring Technology">Fashion Design & Tailoring Technology</option>
+                <option value="Graphic Arts & Media Production">Graphic Arts & Media Production</option>
+              </optgroup>
+              <optgroup label="🛠️ Vocational Training Centers (VTCs — Levels 1 & 2)">
+                <option value="Masonry & Bricklaying">Masonry & Bricklaying</option>
+                <option value="Domestic Electrical Installation">Domestic Electrical Installation</option>
+                <option value="Domestic Plumbing">Domestic Plumbing</option>
+                <option value="Motorcycle Repair & Maintenance">Motorcycle Repair & Maintenance</option>
+                <option value="Hairdressing & Beauty Therapy">Hairdressing & Beauty Therapy</option>
+                <option value="Tailoring & Garment Making">Tailoring & Garment Making</option>
+                <option value="Leather Crafts & Shoemaking">Leather Crafts & Shoemaking</option>
+                <option value="Carpentry & Joinery">Carpentry & Joinery</option>
+              </optgroup>
+              <optgroup label="🚀 Specialized Technical Academies">
+                <option value="RCA - Software Engineering">Rwanda Coding Academy - Software Engineering</option>
+                <option value="RCA - Embedded Systems">Rwanda Coding Academy - Embedded Systems</option>
+                <option value="RCA - Cybersecurity">Rwanda Coding Academy - Cybersecurity</option>
+                <option value="RSCA Nyundo - Music Performance">Rwanda School of Creative Arts (RSCA - Nyundo) - Music Performance</option>
+                <option value="RSCA Nyundo - Fine & Plastic Arts">Rwanda School of Creative Arts (RSCA - Nyundo) - Fine & Plastic Arts</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="loginPassword">Password:</label>
+            <div class="password-wrapper">
+              <input type="password" id="loginPassword" placeholder="Enter password" required>
+              <span class="toggle-password" onclick="togglePasswordVisibility('loginPassword')">👁️</span>
+            </div>
+          </div>
+
+          <div class="form-group" id="teacherOtpGroup" style="display:none; margin-top:12px; padding:12px; background:#f4f0fa; border-radius:8px;">
+            <label for="teacherOtpPin">Teacher OTP PIN (SMS verification — not activated yet)</label>
+            <input type="text" id="teacherOtpPin" inputmode="numeric" placeholder="OTP will be enabled after SMS integration" disabled>
+            <small style="display:block; color:#6f42c1; margin-top:5px;">MTN/Airtel SMS verification is prepared for a future update; no OTP is sent or checked yet.</small>
+          </div>
+          <button type="submit" id="loginSubmitBtn" class="btn-action">Login to Logbook</button>
+        </form>
+      </div>
+
+      <!-- REGISTER FORM -->
+      <div id="registerSection" class="form-section">
+        <div class="card-title" id="regTitle">
+          <span>📝</span> Student Registration
+        </div>
+
+        <form id="registerForm" onsubmit="handleRegister(event)">
+          <div class="form-group">
+            <label for="regName">Full Name:</label>
+            <input type="text" id="regName" placeholder="Enter Full Name" required>
+          </div>
+
+          <div class="form-group" id="schoolNameGroup">
+            <label for="regSchool">Institution / School Name:</label>
+            <input type="text" id="regSchool" placeholder="e.g. GSOB / RCA / IPRC">
+          </div>
+
+          <div class="form-group" id="regTradeGroup">
+            <label for="regTrade">Target Option / Trade:</label>
+            <select id="regTrade">
+              <option value="" disabled selected>Select your trade...</option>
+              <optgroup label="🏥 Health & Medical Sciences">
+                <option value="Associate Nursing">Associate Nursing</option>
+                <option value="Medical Laboratory Sciences">Medical Laboratory Sciences</option>
+                <option value="Dental Therapy & Oral Health">Dental Therapy & Oral Health</option>
+              </optgroup>
+              <optgroup label="💻 ICT & Digital Technologies">
+                <option value="Software Development">Software Development</option>
+                <option value="Computer Systems & Architecture">Computer Systems & Architecture</option>
+                <option value="Networking & Internet Technologies">Networking & Internet Technologies</option>
+                <option value="Multimedia Production">Multimedia Production</option>
+                <option value="Software Programming & Embedded Systems">Software Programming & Embedded Systems</option>
+              </optgroup>
+              <optgroup label="🏗️ Construction & Building Services">
+                <option value="Building Construction">Building Construction</option>
+                <option value="Civil Engineering & Public Works">Civil Engineering & Public Works</option>
+                <option value="Plumbing Technology">Plumbing Technology</option>
+                <option value="Land Surveying">Land Surveying</option>
+                <option value="Interior Design">Interior Design</option>
+              </optgroup>
+              <optgroup label="⚡ Energy & Electrical Engineering">
+                <option value="Electrical Technology">Electrical Technology</option>
+                <option value="Renewable Energy (Solar, Biomass, Hydro)">Renewable Energy (Solar, Biomass, Hydro)</option>
+                <option value="Electronics & Telecommunication">Electronics & Telecommunication</option>
+              </optgroup>
+              <optgroup label="🛠️ Manufacturing, Mechanical & Automotive">
+                <option value="Automobile Technology (Engine & Bodywork)">Automobile Technology (Engine & Bodywork)</option>
+                <option value="Heavy Machinery Maintenance">Heavy Machinery Maintenance</option>
+                <option value="Manufacturing Technology / Mechanical Production">Manufacturing Technology / Mechanical Production</option>
+                <option value="Welding & Fabrication">Welding & Fabrication</option>
+              </optgroup>
+              <optgroup label="🌿 Agriculture, Animal Resources & Food Processing">
+                <option value="General Agriculture & Crop Production">General Agriculture & Crop Production</option>
+                <option value="Animal Health & Veterinary Technology">Animal Health & Veterinary Technology</option>
+                <option value="Food Processing & Technology">Food Processing & Technology</option>
+                <option value="Forestry & Wood Technology">Forestry & Wood Technology</option>
+                <option value="Irrigation & Water Engineering">Irrigation & Water Engineering</option>
+              </optgroup>
+              <optgroup label="🏨 Hospitality, Tourism & Creative Arts">
+                <option value="Culinary Arts">Culinary Arts</option>
+                <option value="Food & Beverage Operations">Food & Beverage Operations</option>
+                <option value="Front Office & Housekeeping Operations">Front Office & Housekeeping Operations</option>
+                <option value="Tourism & Park Management">Tourism & Park Management</option>
+                <option value="Fashion Design & Tailoring Technology">Fashion Design & Tailoring Technology</option>
+                <option value="Graphic Arts & Media Production">Graphic Arts & Media Production</option>
+              </optgroup>
+              <optgroup label="🛠️ Vocational Training Centers (VTCs — Levels 1 & 2)">
+                <option value="Masonry & Bricklaying">Masonry & Bricklaying</option>
+                <option value="Domestic Electrical Installation">Domestic Electrical Installation</option>
+                <option value="Domestic Plumbing">Domestic Plumbing</option>
+                <option value="Motorcycle Repair & Maintenance">Motorcycle Repair & Maintenance</option>
+                <option value="Hairdressing & Beauty Therapy">Hairdressing & Beauty Therapy</option>
+                <option value="Tailoring & Garment Making">Tailoring & Garment Making</option>
+                <option value="Leather Crafts & Shoemaking">Leather Crafts & Shoemaking</option>
+                <option value="Carpentry & Joinery">Carpentry & Joinery</option>
+              </optgroup>
+              <optgroup label="🚀 Specialized Technical Academies">
+                <option value="RCA - Software Engineering">Rwanda Coding Academy - Software Engineering</option>
+                <option value="RCA - Embedded Systems">Rwanda Coding Academy - Embedded Systems</option>
+                <option value="RCA - Cybersecurity">Rwanda Coding Academy - Cybersecurity</option>
+                <option value="RSCA Nyundo - Music Performance">Rwanda School of Creative Arts (RSCA - Nyundo) - Music Performance</option>
+                <option value="RSCA Nyundo - Fine & Plastic Arts">Rwanda School of Creative Arts (RSCA - Nyundo) - Fine & Plastic Arts</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div id="teacherExtraFields" style="display: none;">
+            <div class="form-group">
+              <label for="regCamis">Teacher CAMIS Code *</label>
+              <input type="text" id="regCamis" placeholder="e.g. 24095012002">
+            </div>
+
+            <div class="form-group">
+              <label for="regDepartment">Teacher Subject / Department:</label>
+              <input type="text" id="regDepartment" placeholder="e.g. Practical Clinical Instructor">
+            </div>
+
+            <div class="form-group">
+              <label for="regTeacherPhone">Teacher Phone Number *</label>
+              <input type="tel" id="regTeacherPhone" placeholder="e.g. 0788XXXXXX" autocomplete="tel">
+            </div>
+          </div>
+
+          <div id="supervisorExtraFields" style="display: none;">
+            <div class="form-group">
+              <label for="regPracticeInst">Attachment / Practice Institution Name *</label>
+              <input type="text" id="regPracticeInst" placeholder="e.g. Gihara / CHUB / BK TECH">
+            </div>
+
+            <div class="form-group">
+              <label for="regSupPosition">Supervisor Title / Position:</label>
+              <input type="text" id="regSupPosition" placeholder="e.g. Head Nurse / Senior Electrical Engineer">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="regPassport">Upload Passport Photo:</label>
+            <input type="file" id="regPassport" accept="image/*" onchange="previewPassportPhoto(event)">
+            <div class="passport-preview-container">
+              <img id="passportPreview" class="passport-preview" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><rect width='80' height='80' fill='%23e9ecef'/><text x='50%' y='50%' font-size='12' text-anchor='middle' alignment-baseline='middle' fill='%236c757d'>Photo</text></svg>" alt="Preview">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="regPassword">Create Password:</label>
+            <div class="password-wrapper">
+              <input type="password" id="regPassword" placeholder="Create password" required>
+              <span class="toggle-password" onclick="togglePasswordVisibility('regPassword')">👁️</span>
+            </div>
+          </div>
+
+          <button type="submit" id="regSubmitBtn" class="btn-action">Register & Enter</button>
+        </form>
+      </div>
+
+    </div>
+
+    <!-- TEACHER DASHBOARD AREA -->
+    <div id="teacherDashboard" class="teacher-dashboard">
+      <div class="teacher-dashboard-header">
+        <div class="teacher-profile-wrapper">
+          <img id="teacherAvatar" class="teacher-avatar" src="" alt="Teacher Profile Photo">
+          <div>
+            <h2 id="teacherSchoolTitle" style="margin:0; color:var(--teacher-purple);">🏫 School Student Directory</h2>
+            <p id="teacherWelcomeText" style="margin:5px 0 0; font-size:0.9rem; color:#666;"></p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="btn-edit-profile" onclick="openEditTeacherModal()">✏️ Edit Profile</button>
+          <button onclick="teacherLogout()" style="background:#dc3545; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-weight:bold;">Logout</button>
+        </div>
+      </div>
+
+      <div class="search-box-container">
+        <input type="text" id="studentSearchInput" class="search-input" placeholder="🔍 Search student by full name or registration code..." oninput="filterStudents()">
+      </div>
+
+      <h4 style="margin-bottom: 12px; color:#444;">Students Enrolled in Your School — Awaiting Academic Marks:</h4>
+      <div id="studentListContainer"></div>
+      <h4 style="margin:22px 0 12px; color:#208C44;">✅ Completed — Academic Marks Saved:</h4>
+      <div id="completedStudentListContainer"></div>
+    </div>
+
+    <!-- FIELD SUPERVISOR DASHBOARD AREA -->
+    <div id="supervisorDashboard" class="supervisor-dashboard">
+      <div class="supervisor-dashboard-header">
+        <div class="supervisor-profile-wrapper">
+          <img id="supervisorAvatar" class="supervisor-avatar" src="" alt="Supervisor Photo">
+          <div>
+            <h2 id="supInstTitle" style="margin:0; color:var(--supervisor-green);">🏢 Attachment Trainees Directory</h2>
+            <p id="supWelcomeText" style="margin:5px 0 0; font-size:0.9rem; color:#666;"></p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="btn-edit-profile sup-edit" onclick="openEditSupervisorModal()">✏️ Edit Profile</button>
+          <button onclick="supervisorLogout()" style="background:#dc3545; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-weight:bold;">Logout</button>
+        </div>
+      </div>
+
+      <div class="search-box-container">
+        <input type="text" id="supStudentSearchInput" class="search-input sup-search" placeholder="🔍 Search attached trainee by name or code..." oninput="filterSupervisorStudents()">
+      </div>
+
+      <h4 style="margin-bottom: 12px; color:#444;">Attached Trainees at Your Institution:</h4>
+      <div id="supStudentListContainer"></div>
+    </div>
+
+  </div>
+
+  <!-- TEACHER EDIT PROFILE MODAL -->
+  <div id="editTeacherModal" class="modal-overlay">
+    <div class="modal-card">
+      <h3 style="margin-top:0; color:var(--teacher-purple);">✏️ Edit Teacher Profile</h3>
+      <form onsubmit="saveTeacherProfile(event)">
+        <div class="form-group">
+          <label for="editTeacherName">Full Name:</label>
+          <input type="text" id="editTeacherName" required>
+        </div>
+
+        <div class="form-group">
+          <label for="editTeacherSchool">Institution / School Name:</label>
+          <input type="text" id="editTeacherSchool" required>
+        </div>
+
+        <div class="form-group">
+          <label for="editTeacherCamis">CAMIS Code:</label>
+          <input type="text" id="editTeacherCamis" required>
+        </div>
+
+        <div class="form-group">
+          <label for="editTeacherDept">Subject / Department:</label>
+          <input type="text" id="editTeacherDept">
+        </div>
+
+        <div class="form-group">
+          <label for="editTeacherPhone">Phone Number:</label>
+          <input type="tel" id="editTeacherPhone" autocomplete="tel">
+        </div>
+
+        <div class="form-group">
+          <label for="editTeacherPhoto">Update Photo:</label>
+          <input type="file" id="editTeacherPhoto" accept="image/*" onchange="previewEditTeacherPhoto(event)">
+          <div class="passport-preview-container">
+            <img id="editTeacherPhotoPreview" class="passport-preview" src="" alt="Preview">
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeEditTeacherModal()">Cancel</button>
+          <button type="submit" class="btn-action teacher-bg" style="flex:1;">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SUPERVISOR EDIT PROFILE MODAL -->
+  <div id="editSupervisorModal" class="modal-overlay">
+    <div class="modal-card">
+      <h3 style="margin-top:0; color:var(--supervisor-green);">✏️ Edit Field Supervisor Profile</h3>
+      <form onsubmit="saveSupervisorProfile(event)">
+        <div class="form-group">
+          <label for="editSupName">Full Name:</label>
+          <input type="text" id="editSupName" required>
+        </div>
+
+        <div class="form-group">
+          <label for="editSupInst">Attachment / Practice Institution:</label>
+          <input type="text" id="editSupInst" required>
+        </div>
+
+        <div class="form-group">
+          <label for="editSupPosition">Supervisor Title / Position:</label>
+          <input type="text" id="editSupPosition" required>
+        </div>
+
+        <div class="form-group">
+          <label for="editSupPhoto">Update Photo:</label>
+          <input type="file" id="editSupPhoto" accept="image/*" onchange="previewEditSupPhoto(event)">
+          <div class="passport-preview-container">
+            <img id="editSupPhotoPreview" class="passport-preview" src="" alt="Preview">
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeEditSupervisorModal()">Cancel</button>
+          <button type="submit" class="btn-action supervisor-bg" style="flex:1;">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let activeRole = 'student'; 
+    let currentPassportBase64 = "";
+    let tempEditPhotoBase64 = null;
+    let schoolStudentsList = []; 
+    let supStudentsList = [];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedTeacher = localStorage.getItem('rw_current_teacher');
+      const savedSupervisor = localStorage.getItem('rw_current_supervisor');
+
+      if (savedTeacher) {
+        try {
+          const teacherObj = JSON.parse(savedTeacher);
+          loadTeacherDashboard(teacherObj);
+        } catch (e) {
+          console.error("Error loading saved teacher session", e);
+        }
+      } else if (savedSupervisor) {
+        try {
+          const supObj = JSON.parse(savedSupervisor);
+          loadSupervisorDashboard(supObj);
+        } catch (e) {
+          console.error("Error loading saved supervisor session", e);
+        }
+      }
+    });
+
+    function setRole(role) {
+      activeRole = role;
+      const studentBtn = document.getElementById('roleStudentBtn');
+      const teacherBtn = document.getElementById('roleTeacherBtn');
+      const supervisorBtn = document.getElementById('roleSupervisorBtn');
+      const teacherOtpGroup = document.getElementById('teacherOtpGroup');
+      if (teacherOtpGroup) teacherOtpGroup.style.display = role === 'teacher' ? 'block' : 'none';
+      
+      const loginCodeGroup = document.getElementById('loginCodeGroup');
+      const teacherEmailGroup = document.getElementById('teacherEmailGroup');
+      const supervisorEmailGroup = document.getElementById('supervisorEmailGroup');
+      const loginTradeGroup = document.getElementById('loginTradeGroup');
+      
+      const schoolNameGroup = document.getElementById('schoolNameGroup');
+      const regTradeGroup = document.getElementById('regTradeGroup');
+      const teacherExtraFields = document.getElementById('teacherExtraFields');
+      const supervisorExtraFields = document.getElementById('supervisorExtraFields');
+
+      const loginTitle = document.getElementById('loginTitle');
+      const regTitle = document.getElementById('regTitle');
+      const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+      const regSubmitBtn = document.getElementById('regSubmitBtn');
+
+      if (role === 'student') {
+        studentBtn.className = "role-btn active-student";
+        teacherBtn.className = "role-btn";
+        supervisorBtn.className = "role-btn";
+
+        loginCodeGroup.style.display = 'block';
+        teacherEmailGroup.style.display = 'none';
+        supervisorEmailGroup.style.display = 'none';
+        loginTradeGroup.style.display = 'block';
+
+        schoolNameGroup.style.display = 'block';
+        regTradeGroup.style.display = 'block';
+        teacherExtraFields.style.display = 'none';
+        supervisorExtraFields.style.display = 'none';
+
+        loginTitle.innerHTML = "<span>🔑</span> Student Login";
+        regTitle.innerHTML = "<span>📝</span> Student Registration";
+        
+        loginSubmitBtn.className = "btn-action";
+        regSubmitBtn.className = "btn-action";
+      } else if (role === 'teacher') {
+        teacherBtn.className = "role-btn active-teacher";
+        studentBtn.className = "role-btn";
+        supervisorBtn.className = "role-btn";
+
+        loginCodeGroup.style.display = 'none';
+        teacherEmailGroup.style.display = 'block';
+        supervisorEmailGroup.style.display = 'none';
+        loginTradeGroup.style.display = 'none';
+
+        schoolNameGroup.style.display = 'block';
+        regTradeGroup.style.display = 'none';
+        teacherExtraFields.style.display = 'block';
+        supervisorExtraFields.style.display = 'none';
+
+        loginTitle.innerHTML = "<span>👨‍🏫</span> Teacher / Instructor Login";
+        regTitle.innerHTML = "<span>👨‍🏫</span> Teacher Registration";
+
+        loginSubmitBtn.className = "btn-action teacher-bg";
+        regSubmitBtn.className = "btn-action teacher-bg";
+      } else {
+        supervisorBtn.className = "role-btn active-supervisor";
+        studentBtn.className = "role-btn";
+        teacherBtn.className = "role-btn";
+
+        loginCodeGroup.style.display = 'none';
+        teacherEmailGroup.style.display = 'none';
+        supervisorEmailGroup.style.display = 'block';
+        loginTradeGroup.style.display = 'none';
+
+        schoolNameGroup.style.display = 'none';
+        regTradeGroup.style.display = 'none';
+        teacherExtraFields.style.display = 'none';
+        supervisorExtraFields.style.display = 'block';
+
+        loginTitle.innerHTML = "<span>📋</span> Industrial Supervisor Login";
+        regTitle.innerHTML = "<span>📋</span> Industrial Supervisor Registration";
+
+        loginSubmitBtn.className = "btn-action supervisor-bg";
+        regSubmitBtn.className = "btn-action supervisor-bg";
+      }
+    }
+
+    function formatStudentCode(input) {
+      let rawDigits = input.value.replace(/\D/g, '');
+      let formatted = '';
+      if (rawDigits.length > 0) formatted += rawDigits.substring(0, 4);
+      if (rawDigits.length >= 5) formatted += '-' + rawDigits.substring(4, 8);
+      if (rawDigits.length >= 9) formatted += '-' + rawDigits.substring(8, 11);
+      input.value = formatted;
+    }
+
+    function switchForm(type) {
+      const loginSection = document.getElementById('loginSection');
+      const registerSection = document.getElementById('registerSection');
+      const btnLogin = document.getElementById('btnLogin');
+      const btnRegister = document.getElementById('btnRegister');
+
+      if (type === 'login') {
+        loginSection.classList.add('active');
+        registerSection.classList.remove('active');
+        btnLogin.style.backgroundColor = 'var(--primary-blue)';
+        btnLogin.style.color = 'white';
+        btnRegister.style.backgroundColor = 'white';
+        btnRegister.style.color = 'var(--primary-blue)';
+      } else {
+        registerSection.classList.add('active');
+        loginSection.classList.remove('active');
+        btnRegister.style.backgroundColor = 'var(--primary-blue)';
+        btnRegister.style.color = 'white';
+        btnLogin.style.backgroundColor = 'white';
+        btnLogin.style.color = 'var(--primary-blue)';
+      }
+    }
+
+    function togglePasswordVisibility(fieldId) {
+      const input = document.getElementById(fieldId);
+      input.type = input.type === "password" ? "text" : "password";
+    }
+
+    function previewPassportPhoto(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 120;
+            canvas.height = 120;
+            ctx.drawImage(img, 0, 0, 120, 120);
+            currentPassportBase64 = canvas.toDataURL('image/jpeg', 0.7);
+            document.getElementById('passportPreview').src = currentPassportBase64;
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function handleRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('regName').value.trim();
+      const password = document.getElementById('regPassword').value;
+
+      if (activeRole === 'student') {
+        const school = document.getElementById('regSchool').value.trim();
+        const trade = document.getElementById('regTrade').value;
+        if (!name || !school || !password || !trade) {
+          alert("Please fill in all student fields.");
+          return;
+        }
+
+        let registeredUsers = JSON.parse(localStorage.getItem('rw_registered_users')) || [];
+        const nextSequence = (registeredUsers.length + 1).toString().padStart(3, '0');
+        const code = "0000-0000-" + nextSequence;
+
+        const newUser = {
+          code: code,
+          fullName: name,
+          school: school,
+          trade: trade,
+          password: password,
+          photo: currentPassportBase64,
+          role: 'student'
+        };
+
+        registeredUsers.push(newUser);
+        localStorage.setItem('rw_registered_users', JSON.stringify(registeredUsers));
+        localStorage.setItem('rw_current_user', JSON.stringify(newUser));
+
+        alert("Student Registration Successful!\n\nYour Student ID Code is: " + code);
+        window.location.href = "dashboard.html";
+
+      } else if (activeRole === 'teacher') {
+        const school = document.getElementById('regSchool').value.trim();
+        const camisCode = document.getElementById('regCamis').value.trim();
+        const department = document.getElementById('regDepartment').value.trim();
+        const phone = document.getElementById('regTeacherPhone').value.trim();
+
+        if (!name || !school || !password || !camisCode || !phone) {
+          alert("⚠️ Please fill in all required teacher fields including CAMIS Code and Phone Number.");
+          return;
+        }
+
+        let registeredTeachers = JSON.parse(localStorage.getItem('rw_registered_teachers')) || [];
+        const teacherID = "T-" + Math.floor(1000 + Math.random() * 9000);
+
+        const newTeacher = {
+          teacherID: teacherID,
+          camisCode: camisCode,
+          fullName: name,
+          school: school,
+          department: department,
+          phone: phone,
+          password: password,
+          photo: currentPassportBase64,
+          role: 'teacher'
+        };
+
+        registeredTeachers.push(newTeacher);
+        localStorage.setItem('rw_registered_teachers', JSON.stringify(registeredTeachers));
+
+        alert(`✅ Teacher Account Created Successfully!\n\nUse your Teacher ID or CAMIS Code to log in:\n- Teacher ID: ${teacherID}\n- CAMIS Code: ${camisCode}`);
+        switchForm('login');
+      } else {
+        const practiceInst = document.getElementById('regPracticeInst').value.trim();
+        const position = document.getElementById('regSupPosition').value.trim();
+
+        if (!name || !practiceInst || !password) {
+          alert("⚠️ Please fill in all required supervisor fields including Practice Institution.");
+          return;
+        }
+
+        let registeredSupervisors = JSON.parse(localStorage.getItem('rw_registered_supervisors')) || [];
+        const supervisorID = "SUP-" + Math.floor(1000 + Math.random() * 9000);
+
+        const newSupervisor = {
+          supervisorID: supervisorID,
+          fullName: name,
+          practiceInst: practiceInst,
+          position: position,
+          password: password,
+          photo: currentPassportBase64,
+          role: 'supervisor'
+        };
+
+        registeredSupervisors.push(newSupervisor);
+        localStorage.setItem('rw_registered_supervisors', JSON.stringify(registeredSupervisors));
+
+        alert(`✅ Field Supervisor Account Created!\n\nYour Supervisor ID: ${supervisorID}\nInstitution: ${practiceInst}`);
+        switchForm('login');
+      }
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const password = document.getElementById('loginPassword').value.trim();
+
+      if (activeRole === 'student') {
+        const code = document.getElementById('loginCode').value.trim();
+
+        if (!code) {
+          alert("⚠️ Please enter your Student ID Code.");
+          return;
+        }
+
+        let registeredUsers = JSON.parse(localStorage.getItem('rw_registered_users')) || [];
+        
+        const matchedUser = registeredUsers.find(u => {
+          const storedCode = (u.code || u.registrationCode || u.studentCode || '').trim();
+          return storedCode === code;
+        });
+
+        if (!matchedUser) {
+          alert("❌ Access Denied: Student ID Code (" + code + ") not found!");
+          return;
+        }
+
+        if (matchedUser.password && matchedUser.password.trim() !== password) {
+          alert("❌ Incorrect password!");
+          return;
+        }
+
+        localStorage.setItem('rw_current_user', JSON.stringify(matchedUser));
+        alert("✅ Welcome back, " + matchedUser.fullName + "!");
+        window.location.href = "dashboard.html";
+
+      } else if (activeRole === 'teacher') {
+        const teacherInput = document.getElementById('loginTeacherEmail').value.trim().toUpperCase();
+
+        if (!teacherInput) {
+          alert("⚠️ Please enter your Teacher ID or CAMIS Code.");
+          return;
+        }
+
+        let registeredTeachers = JSON.parse(localStorage.getItem('rw_registered_teachers')) || [];
+
+        const matchedTeacher = registeredTeachers.find(t => {
+          const storedID = (t.teacherID || '').trim().toUpperCase();
+          const storedCamis = (t.camisCode || '').trim().toUpperCase();
+          
+          return (storedID === teacherInput || storedCamis === teacherInput);
+        });
+
+        if (!matchedTeacher) {
+          alert("❌ Access Denied: No account matching that Teacher ID/CAMIS Code!");
+          return;
+        }
+
+        if (matchedTeacher.password && matchedTeacher.password.trim() !== password) {
+          alert("❌ Incorrect password!");
+          return;
+        }
+
+        localStorage.setItem('rw_current_teacher', JSON.stringify(matchedTeacher));
+        loadTeacherDashboard(matchedTeacher);
+
+      } else {
+        const supInput = document.getElementById('loginSupervisorEmail').value.trim().toUpperCase();
+
+        if (!supInput) {
+          alert("⚠️ Please enter your Supervisor ID or Institution Code.");
+          return;
+        }
+
+        let registeredSupervisors = JSON.parse(localStorage.getItem('rw_registered_supervisors')) || [];
+
+        const matchedSup = registeredSupervisors.find(s => {
+          const storedID = (s.supervisorID || '').trim().toUpperCase();
+          const storedInst = (s.practiceInst || '').trim().toUpperCase();
+
+          return (storedID === supInput || storedInst === supInput);
+        });
+
+        if (!matchedSup) {
+          alert("❌ Access Denied: No account matching that Supervisor ID/Institution!");
+          return;
+        }
+
+        if (matchedSup.password && matchedSup.password.trim() !== password) {
+          alert("❌ Incorrect password!");
+          return;
+        }
+
+        localStorage.setItem('rw_current_supervisor', JSON.stringify(matchedSup));
+        loadSupervisorDashboard(matchedSup);
+      }
+    }
+
+    function loadTeacherDashboard(teacher) {
+      document.getElementById('roleSwitcher').style.display = 'none';
+      document.getElementById('authToggleContainer').style.display = 'none';
+      document.getElementById('authCard').style.display = 'none';
+      document.getElementById('supervisorDashboard').style.display = 'none';
+
+      const dashboard = document.getElementById('teacherDashboard');
+      dashboard.style.display = 'block';
+
+      document.getElementById('teacherAvatar').src = teacher.photo || currentPassportBase64;
+      document.getElementById('teacherSchoolTitle').innerText = "🏫 " + teacher.school + " — Student Directory";
+      document.getElementById('teacherWelcomeText').innerText = "Instructor: " + teacher.fullName + " (ID: " + teacher.teacherID + ")";
+
+      let registeredUsers = JSON.parse(localStorage.getItem('rw_registered_users')) || [];
+      
+      schoolStudentsList = registeredUsers.filter(
+        s => s.school && s.school.trim().toLowerCase() === teacher.school.trim().toLowerCase()
+      );
+
+      renderStudentList(schoolStudentsList, teacher.school);
+    }
+
+    function loadSupervisorDashboard(sup) {
+      document.getElementById('roleSwitcher').style.display = 'none';
+      document.getElementById('authToggleContainer').style.display = 'none';
+      document.getElementById('authCard').style.display = 'none';
+      document.getElementById('teacherDashboard').style.display = 'none';
+
+      const dashboard = document.getElementById('supervisorDashboard');
+      dashboard.style.display = 'block';
+
+      document.getElementById('supervisorAvatar').src = sup.photo || currentPassportBase64;
+      document.getElementById('supInstTitle').innerText = "🏢 " + sup.practiceInst + " — Trainees Directory";
+      document.getElementById('supWelcomeText').innerText = "Supervisor: " + sup.fullName + " (" + (sup.position || 'Field Evaluator') + ")";
+
+      let registeredUsers = JSON.parse(localStorage.getItem('rw_registered_users')) || [];
+      
+      const targetInst = (sup.practiceInst || '').trim().toLowerCase();
+      supStudentsList = registeredUsers.filter(s => {
+        const studentInst = (s.practiceInst || s.hospital || '').trim().toLowerCase();
+        return studentInst === targetInst && targetInst !== '';
+      });
+
+      renderSupervisorStudentList(supStudentsList, sup.practiceInst);
+    }
+
+    function renderStudentList(students, schoolName) {
+      const listContainer = document.getElementById('studentListContainer');
+      const completedContainer = document.getElementById('completedStudentListContainer');
+      listContainer.innerHTML = '';
+      if (completedContainer) completedContainer.innerHTML = '';
+
+      const isAcademicCompleted = student => {
+        const code = student.code || student.registrationCode || student.studentCode || '';
+        const perStudent = localStorage.getItem(`rw_academic_eval_data_${code}`);
+        let evalData = student.academicEval || null;
+        if (!evalData && perStudent) { try { evalData = JSON.parse(perStudent); } catch (e) {} }
+        return !!(evalData && (evalData.evalDate || evalData.weightedScore !== undefined || evalData.totalRaw !== undefined));
+      };
+      const pending = students.filter(student => !isAcademicCompleted(student));
+      const completed = students.filter(student => isAcademicCompleted(student));
+      const renderGroup = (target, items, emptyText, completedGroup) => {
+        if (!target) return;
+        if (!items.length) {
+          target.innerHTML = `<div style="padding:18px; background:#f8f9fa; border-radius:8px; color:#777; margin-bottom:10px;">${emptyText}</div>`;
+          return;
+        }
+        items.forEach(student => {
+          const code = student.code || student.registrationCode || student.studentCode || '';
+          const item = document.createElement('div');
+          item.className = 'student-card-item';
+          item.innerHTML = `
+            <div class="student-info">
+              <img src="${student.photo || ''}" alt="Student Photo">
+              <div>
+                <strong style="font-size:1.05rem; color:#222;">${student.fullName || 'Student'}</strong><br>
+                <span style="font-size:0.85rem; color:#666;">Code: ${code || 'N/A'} | Option: ${student.trade || 'N/A'}</span><br>
+                ${completedGroup ? '<span style="color:#208C44;font-weight:bold;font-size:.85rem;">✓ Marks saved</span>' : '<span style="color:#996c00;font-size:.85rem;">Awaiting marks</span>'}
+              </div>
+            </div>
+            <button class="btn-view-student" onclick="viewStudentFullData('${code}')">${completedGroup ? 'View / Edit Marks' : 'View Full Data'}</button>
+          `;
+          target.appendChild(item);
+        });
+      };
+      renderGroup(listContainer, pending, `No students awaiting marks for <strong>${schoolName || 'your school'}</strong>.`, false);
+      renderGroup(completedContainer, completed, 'No students have saved academic marks yet.', true);
+    }
+
+    function renderSupervisorStudentList(students, instName) {
+      const listContainer = document.getElementById('supStudentListContainer');
+      listContainer.innerHTML = '';
+
+      if (students.length === 0) {
+        listContainer.innerHTML = `
+          <div style="text-align:center; padding:30px; background:#f8f9fa; border-radius:8px; color:#777;">
+            <p>No trainees registered yet under <strong>${instName || 'your institution'}</strong>.</p>
+            <p style="font-size: 0.85rem; color: #999;">Trainees must select <em>"${instName}"</em> as their attachment institution in their logbook options to appear here.</p>
+          </div>`;
+        return;
+      }
+
+      students.forEach(student => {
+        const item = document.createElement('div');
+        item.className = 'student-card-item';
+        item.innerHTML = `
+          <div class="student-info">
+            <img src="${student.photo || currentPassportBase64}" alt="Student Photo">
+            <div>
+              <strong style="font-size:1.05rem; color:#222;">${student.fullName}</strong><br>
+              <span style="font-size:0.85rem; color:#666;">Code: ${student.code || student.registrationCode || 'N/A'} | School: ${student.school || 'N/A'}</span>
+            </div>
+          </div>
+          <button class="btn-assess-student" onclick="assessStudent('${student.code || student.registrationCode}')">📋 Assess Trainee</button>
+        `;
+        listContainer.appendChild(item);
+      });
+    }
+
+    function filterStudents() {
+      const query = document.getElementById('studentSearchInput').value.toLowerCase().trim();
+      const filtered = schoolStudentsList.filter(student => 
+        (student.fullName || '').toLowerCase().includes(query) || 
+        (student.code || student.registrationCode || '').toLowerCase().includes(query)
+      );
+      renderStudentList(filtered, "Search Filter");
+    }
+
+    function filterSupervisorStudents() {
+      const query = document.getElementById('supStudentSearchInput').value.toLowerCase().trim();
+      const filtered = supStudentsList.filter(student => 
+        (student.fullName || '').toLowerCase().includes(query) || 
+        (student.code || student.registrationCode || '').toLowerCase().includes(query)
+      );
+      const savedSup = JSON.parse(localStorage.getItem('rw_current_supervisor'));
+      renderSupervisorStudentList(filtered, savedSup ? savedSup.practiceInst : "Your Institution");
+    }
+
+    function openEditTeacherModal() {
+      const savedTeacher = localStorage.getItem('rw_current_teacher');
+      if (!savedTeacher) return;
+      
+      const teacher = JSON.parse(savedTeacher);
+      document.getElementById('editTeacherName').value = teacher.fullName || '';
+      document.getElementById('editTeacherSchool').value = teacher.school || '';
+      document.getElementById('editTeacherCamis').value = teacher.camisCode || '';
+      document.getElementById('editTeacherDept').value = teacher.department || '';
+      document.getElementById('editTeacherPhone').value = teacher.phone || '';
+      document.getElementById('editTeacherPhotoPreview').src = teacher.photo || currentPassportBase64;
+      
+      tempEditPhotoBase64 = teacher.photo || null;
+      document.getElementById('editTeacherModal').style.display = 'flex';
+    }
+
+    function closeEditTeacherModal() {
+      document.getElementById('editTeacherModal').style.display = 'none';
+    }
+
+    function previewEditTeacherPhoto(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 120;
+            canvas.height = 120;
+            ctx.drawImage(img, 0, 0, 120, 120);
+            tempEditPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+            document.getElementById('editTeacherPhotoPreview').src = tempEditPhotoBase64;
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function saveTeacherProfile(e) {
+      e.preventDefault();
+      const savedTeacher = localStorage.getItem('rw_current_teacher');
+      if (!savedTeacher) return;
+
+      let teacher = JSON.parse(savedTeacher);
+      
+      teacher.fullName = document.getElementById('editTeacherName').value.trim();
+      teacher.school = document.getElementById('editTeacherSchool').value.trim();
+      teacher.camisCode = document.getElementById('editTeacherCamis').value.trim();
+      teacher.department = document.getElementById('editTeacherDept').value.trim();
+      teacher.phone = document.getElementById('editTeacherPhone').value.trim();
+      
+      if (tempEditPhotoBase64) {
+        teacher.photo = tempEditPhotoBase64;
+      }
+
+      let registeredTeachers = JSON.parse(localStorage.getItem('rw_registered_teachers')) || [];
+      const teacherIndex = registeredTeachers.findIndex(t => t.teacherID === teacher.teacherID);
+      
+      if (teacherIndex !== -1) {
+        registeredTeachers[teacherIndex] = teacher;
+        localStorage.setItem('rw_registered_teachers', JSON.stringify(registeredTeachers));
+      }
+
+      localStorage.setItem('rw_current_teacher', JSON.stringify(teacher));
+
+      alert("✅ Profile updated successfully!");
+      closeEditTeacherModal();
+      loadTeacherDashboard(teacher);
+    }
+
+    function openEditSupervisorModal() {
+      const savedSup = localStorage.getItem('rw_current_supervisor');
+      if (!savedSup) return;
+      
+      const sup = JSON.parse(savedSup);
+      document.getElementById('editSupName').value = sup.fullName || '';
+      document.getElementById('editSupInst').value = sup.practiceInst || '';
+      document.getElementById('editSupPosition').value = sup.position || '';
+      document.getElementById('editSupPhotoPreview').src = sup.photo || currentPassportBase64;
+      
+      tempEditPhotoBase64 = sup.photo || null;
+      document.getElementById('editSupervisorModal').style.display = 'flex';
+    }
+
+    function closeEditSupervisorModal() {
+      document.getElementById('editSupervisorModal').style.display = 'none';
+    }
+
+    function previewEditSupPhoto(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 120;
+            canvas.height = 120;
+            ctx.drawImage(img, 0, 0, 120, 120);
+            tempEditPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+            document.getElementById('editSupPhotoPreview').src = tempEditPhotoBase64;
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function saveSupervisorProfile(e) {
+      e.preventDefault();
+      const savedSup = localStorage.getItem('rw_current_supervisor');
+      if (!savedSup) return;
+
+      let sup = JSON.parse(savedSup);
+      
+      sup.fullName = document.getElementById('editSupName').value.trim();
+      sup.practiceInst = document.getElementById('editSupInst').value.trim();
+      sup.position = document.getElementById('editSupPosition').value.trim();
+      
+      if (tempEditPhotoBase64) {
+        sup.photo = tempEditPhotoBase64;
+      }
+
+      let registeredSupervisors = JSON.parse(localStorage.getItem('rw_registered_supervisors')) || [];
+      const supIndex = registeredSupervisors.findIndex(s => s.supervisorID === sup.supervisorID);
+      
+      if (supIndex !== -1) {
+        registeredSupervisors[supIndex] = sup;
+        localStorage.setItem('rw_registered_supervisors', JSON.stringify(registeredSupervisors));
+      }
+
+      localStorage.setItem('rw_current_supervisor', JSON.stringify(sup));
+
+      alert("✅ Field Supervisor profile updated successfully!");
+      closeEditSupervisorModal();
+      loadSupervisorDashboard(sup);
+    }
+
+    function viewStudentFullData(studentCode) {
+      localStorage.setItem('rw_selected_student_code', studentCode);
+      window.location.href = "ADDITIONAL_LOGS.html";
+    }
+
+    function assessStudent(studentCode) {
+      localStorage.setItem('rw_selected_student_code', studentCode);
+      window.location.href = "SUPERVISOR_EVALUATION.html";
+    }
+
+    function teacherLogout() {
+      localStorage.removeItem('rw_current_teacher');
+      document.getElementById('teacherDashboard').style.display = 'none';
+      document.getElementById('roleSwitcher').style.display = 'flex';
+      document.getElementById('authToggleContainer').style.display = 'flex';
+      document.getElementById('authCard').style.display = 'block';
+      
+      document.getElementById('studentSearchInput').value = '';
+      setRole('student');
+    }
+
+    function supervisorLogout() {
+      localStorage.removeItem('rw_current_supervisor');
+      document.getElementById('supervisorDashboard').style.display = 'none';
+      document.getElementById('roleSwitcher').style.display = 'flex';
+      document.getElementById('authToggleContainer').style.display = 'flex';
+      document.getElementById('authCard').style.display = 'block';
+      
+      document.getElementById('supStudentSearchInput').value = '';
+      setRole('student');
+    }
+  </script>
+</body>
+</html>

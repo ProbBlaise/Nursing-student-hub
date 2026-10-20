@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Industrial / Field Supervisor Assessment</title>
+  <style>
+    :root {
+      --rw-blue: #00A3E0;
+      --rw-green: #208C44;
+      --rw-yellow: #FAD105;
+      --dark-blue: #003366;
+      --bg-light: #F4F7F6;
+      --white: #FFFFFF;
+      --text-dark: #333333;
+      --border-color: #E0E0E0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body::before {
+      content: '';
+      display: block;
+      height: 6px;
+      background: linear-gradient(to right, var(--rw-blue) 45%, var(--rw-yellow) 45% 70%, var(--rw-green) 70%);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+
+    body {
+      background-color: var(--bg-light);
+      color: var(--text-dark);
+      padding: 20px;
+      padding-top: 26px;
+    }
+
+    header {
+      background-color: var(--dark-blue);
+      color: var(--white);
+      padding: 20px;
+      border-radius: 8px 8px 0 0;
+      border-bottom: 5px solid var(--rw-yellow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-btn {
+      background-color: var(--rw-blue);
+      color: var(--white);
+      border: none;
+      padding: 8px 16px;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .student-profile-card {
+      background-color: var(--white);
+      padding: 20px;
+      border-radius: 0 0 8px 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      border-left: 6px solid var(--rw-green);
+    }
+
+    .student-photo {
+      width: 90px;
+      height: 90px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 2px solid var(--rw-blue);
+    }
+
+    .profile-details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px 20px;
+      width: 100%;
+    }
+
+    .container-card {
+      background-color: var(--white);
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+
+    .container-card h3 {
+      color: var(--dark-blue);
+      margin-bottom: 15px;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      border: 1px solid var(--border-color);
+      padding: 10px;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background-color: #f0f4f8;
+      color: var(--dark-blue);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: var(--dark-blue);
+      font-size: 0.9rem;
+    }
+
+    .form-group input, 
+    .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 0.95rem;
+    }
+
+    .btn-submit {
+      background-color: var(--rw-green);
+      color: var(--white);
+      border: none;
+      padding: 12px 24px;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .btn-edit {
+      background-color: var(--rw-yellow);
+      color: var(--dark-blue);
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .badge-present {
+      color: var(--rw-green);
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>📋 Industrial / Field Supervisor Assessment</h1>
+    <button class="nav-btn" onclick="goToPortal()">🏠 Back to Portal</button>
+  </header>
+
+  <!-- 1. STUDENT FULL ACCOUNT DETAILS -->
+  <div class="student-profile-card">
+    <img id="dispPhoto" class="student-photo" src="" alt="Student Photo">
+    <div style="width: 100%;">
+      <h2 id="dispFullName" style="color: var(--dark-blue); margin-bottom: 8px;">Loading Student...</h2>
+      <div class="profile-details-grid">
+        <p><strong>Student ID Code:</strong> <span id="dispCode">---</span></p>
+        <p><strong>School:</strong> <span id="dispSchool">---</span></p>
+        <p><strong>Trade Option:</strong> <span id="dispTrade">---</span></p>
+        <p><strong>Attachment Institution:</strong> <span id="dispPractice">---</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. STUDENT LOGBOOK ENTRIES SUMMARY -->
+  <div class="container-card">
+    <h3>📖 Logged Practical Activities Summary</h3>
+    <div id="logbookTableContainer" style="overflow-x: auto;">
+      <p style="color: #666; font-style: italic;">Loading log entries...</p>
+    </div>
+  </div>
+
+  <!-- 3. STUDENT ATTENDANCE RECORDS -->
+  <div class="container-card">
+    <h3>📅 Student Attendance Records</h3>
+    <div id="attendanceTableContainer" style="overflow-x: auto;">
+      <p style="color: #666; font-style: italic;">Loading attendance logs...</p>
+    </div>
+  </div>
+
+  <!-- 4. STUDENT SELF-ASSESSMENT & REFLECTION -->
+  <div class="container-card">
+    <h3>🧠 Trainee Self-Assessment & Reflections</h3>
+    <div id="selfAssessmentContainer" style="overflow-x: auto;">
+      <p style="color: #666; font-style: italic;">Loading self-assessments...</p>
+    </div>
+  </div>
+
+  <!-- 5. SUPERVISOR EVALUATION TAB -->
+  <div class="container-card" id="tab-eval">
+    <h3>📋 Industrial / Field Supervisor Assessment (50%)</h3>
+    <br>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Supervisor Name *</label>
+        <input type="text" id="supervisorName" placeholder="Enter supervisor name" required>
+      </div>
+      <div class="form-group">
+        <label>Supervisor Phone</label>
+        <input type="tel" id="supervisorPhone" placeholder="0788XXXXXX">
+      </div>
+      <div class="form-group">
+        <label>Supervisor Email</label>
+        <input type="email" id="supervisorEmail" placeholder="supervisor@example.com">
+      </div>
+      <div class="form-group">
+        <label>1. Execution of Technical Routines (0-15)</label>
+        <input type="number" id="evTechRoutines" min="0" max="15" value="0">
+      </div>
+      <div class="form-group">
+        <label>2. Proper Use of Tools & Equipment (0-15)</label>
+        <input type="number" id="evTechTools" min="0" max="15" value="0">
+      </div>
+      <div class="form-group">
+        <label>3. Individual Work Autonomy & Initiative (0-10)</label>
+        <input type="number" id="evAttIndividual" min="0" max="10" value="0">
+      </div>
+      <div class="form-group">
+        <label>4. Teamwork & Interpersonal Communication (0-15)</label>
+        <input type="number" id="evAttInteractive" min="0" max="15" value="0">
+      </div>
+      <div class="form-group">
+        <label>5. Organization & Time Management (0-15)</label>
+        <input type="number" id="evAttOrg" min="0" max="15" value="0">
+      </div>
+      <div class="form-group">
+        <label>6. Professional Ethics & Work Rules (0-15)</label>
+        <input type="number" id="evAttRules" min="0" max="15" value="0">
+      </div>
+      <div class="form-group">
+        <label>7. Quality & Cleanliness of Work Done (0-15)</label>
+        <input type="number" id="evQuality" min="0" max="15" value="0">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Supervisor's General Comments:</label>
+      <textarea id="evComments" rows="3" placeholder="Supervisor feedback..."></textarea>
+    </div>
+
+    <button class="btn-submit" onclick="calculateEvaluation()">Calculate & Save Score</button>
+
+    <div id="evalResult" style="margin-top: 20px; padding: 15px; background: #eef9f1; border-left: 5px solid var(--rw-green); display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+        <h4>Supervisor Score: <span id="totalScore">0</span> / 100 (<span id="totalPercentage">0%</span>)</h4>
+        <button class="btn-edit" onclick="editEvaluation()">✏️ Edit Score</button>
+      </div>
+      <p id="totalWeight" style="font-weight: bold; color: var(--dark-blue);"></p>
+    </div>
+  </div>
+
+  <!-- 6. ACADEMIC EVALUATION RECEIVED FROM TEACHER -->
+  <div class="container-card">
+    <h3>🎓 Academic Evaluator / School Assessor Assessment (50%)</h3>
+    <div style="padding: 12px; background:#eef4f9; border-left: 5px solid var(--rw-blue);">
+      <p><strong>Teacher / Assessor:</strong> <span id="teacherResultName">Not Recorded</span></p>
+      <p><strong>CAMIS / Assessor ID:</strong> <span id="teacherResultCode">Not Recorded</span></p>
+      <p><strong>Phone:</strong> <span id="teacherResultPhone">Not Recorded</span></p>
+      <p><strong>Assessment Date:</strong> <span id="teacherResultDate">Pending</span></p>
+    </div>
+    <div class="form-grid" style="margin-top: 15px;">
+      <div class="form-group"><label>1. Logbook Quality & Daily Records</label><input type="number" id="teacherMarkLogbook" readonly></div>
+      <div class="form-group"><label>2. Attendance & Log Accuracy</label><input type="number" id="teacherMarkAttendance" readonly></div>
+      <div class="form-group"><label>3. Trainee Self-Assessment</label><input type="number" id="teacherMarkSelfReport" readonly></div>
+      <div class="form-group"><label>4. Visiting Assessor Review</label><input type="number" id="teacherMarkVisiting" readonly></div>
+      <div class="form-group"><label>5. Field Report Structure</label><input type="number" id="teacherMarkReport" readonly></div>
+      <div class="form-group"><label>6. Logbook Defense / Oral Examination</label><input type="number" id="teacherMarkDefense" readonly></div>
+      <div class="form-group"><label>7. Mastery of Acquired Competences</label><input type="number" id="teacherMarkMastery" readonly></div>
+    </div>
+    <div class="form-group">
+      <label>Academic Evaluator's General Comments:</label>
+      <textarea id="teacherResultComments" rows="3" readonly placeholder="No comments recorded yet."></textarea>
+    </div>
+    <p style="font-weight:bold; color:var(--dark-blue);">Academic Contribution: <span id="teacherResultWeighted">0.0 / 50</span></p>
+  </div>
+
+  <!-- 6. FINAL COMBINED RESULT -->
+  <div class="container-card" style="background:#eef7ed; border-left: 6px solid var(--rw-green);">
+    <h3 style="color: var(--rw-green);">🏆 Overall Combined Assessment Result (100%)</h3>
+    <p>Field Supervisor Contribution: <strong id="finalSupervisorContribution">0.0 / 50</strong></p>
+    <p>Academic Assessor Contribution: <strong id="finalAcademicContribution">0.0 / 50</strong></p>
+    <h2 style="color: var(--dark-blue);">Final Result: <span id="finalCombinedScore">0.0%</span></h2>
+    <p id="finalCombinedStatus" style="font-weight:bold;">PENDING</p>
+  </div>
+
+  <script>
+    let selectedStudent = null;
+
+    function goToPortal() {
+      window.location.href = "HOMESCREEN.html";
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const selectedCode = localStorage.getItem('rw_selected_student_code');
+      const allUsers = JSON.parse(localStorage.getItem('rw_registered_users')) || [];
+
+      if (selectedCode) {
+        selectedStudent = allUsers.find(u => (u.code || u.registrationCode || u.studentCode) === selectedCode);
+      }
+
+      if (!selectedStudent) {
+        alert("No student record selected. Returning to Portal.");
+        goToPortal();
+        return;
+      }
+
+      // Populate Student Profile Details
+      document.getElementById('dispFullName').innerText = selectedStudent.fullName || selectedStudent.name || "Student Learner";
+      document.getElementById('dispCode').innerText = selectedStudent.code || selectedStudent.registrationCode || "N/A";
+      document.getElementById('dispSchool').innerText = selectedStudent.school || "N/A";
+      document.getElementById('dispTrade').innerText = selectedStudent.trade || "N/A";
+      document.getElementById('dispPractice').innerText = selectedStudent.practiceInst || selectedStudent.hospital || "Not Specified";
+      document.getElementById('dispPhoto').src = selectedStudent.photo || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><rect width='80' height='80' fill='%23e9ecef'/><text x='50%' y='50%' font-size='12' text-anchor='middle' alignment-baseline='middle' fill='%236c757d'>Photo</text></svg>";
+
+      const companyInfo = selectedStudent.sd_company || {};
+      document.getElementById('supervisorName').value = companyInfo.superName || '';
+      document.getElementById('supervisorPhone').value = companyInfo.superPhone || '';
+      document.getElementById('supervisorEmail').value = companyInfo.email || '';
+
+      // Populate Logbook Practical Entries
+      const logs = selectedStudent.sd_tasks || selectedStudent.tasks || selectedStudent.logs || selectedStudent.logbookEntries || [];
+      const tableContainer = document.getElementById('logbookTableContainer');
+
+      if (logs.length === 0) {
+        tableContainer.innerHTML = `<p style="color: #666; font-style: italic;">No practical log entries recorded yet by ${selectedStudent.fullName}.</p>`;
+      } else {
+        let html = `
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Department / Unit</th>
+                <th>Procedure</th>
+                <th>Practical Skill / Activity Executed</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+        logs.forEach(log => {
+          html += `
+            <tr>
+              <td>${log.date || '---'}</td>
+              <td>${log.department || log.unit || (log.week ? `Week ${log.week}` : '---')}</td>
+              <td><strong>${log.procedure || log.competence || log.activity || '---'}</strong></td>
+              <td>${log.activity || log.description || '---'}${log.description && log.activity ? `<br><small>${log.description}</small>` : ''}</td>
+              <td><span style="color:var(--rw-green); font-weight:bold;">${log.status || (log.supervised ? 'Verified' : 'Submitted')}${log.hours ? ` - ${log.hours} hrs` : ''}</span></td>
+            </tr>
+          `;
+        });
+        html += `</tbody></table>`;
+        tableContainer.innerHTML = html;
+      }
+
+      // Populate Attendance Entries
+      const attendanceLogs = selectedStudent.attendanceLogs || selectedStudent.attendance || [];
+      const attContainer = document.getElementById('attendanceTableContainer');
+
+      if (attendanceLogs.length === 0) {
+        attContainer.innerHTML = `<p style="color: #666; font-style: italic;">No attendance records registered yet for ${selectedStudent.fullName}.</p>`;
+      } else {
+        let attHtml = `
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Shift / Time Slot</th>
+                <th>Time In</th>
+                <th>Time Out</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+        attendanceLogs.forEach(att => {
+          attHtml += `
+            <tr>
+              <td>${att.date || '---'}</td>
+              <td>${att.shift || 'Morning Shift'}</td>
+              <td>${att.timeIn || '---'}</td>
+              <td>${att.timeOut || '---'}</td>
+              <td><span class="badge-present">${att.status || 'Present'}</span></td>
+            </tr>
+          `;
+        });
+        attHtml += `</tbody></table>`;
+        attContainer.innerHTML = attHtml;
+      }
+
+      // Populate Self-Assessments
+      const selfEvals = selectedStudent.sd_self_list || selectedStudent.selfAssessments || selectedStudent.selfEvaluations || [];
+      const selfContainer = document.getElementById('selfAssessmentContainer');
+
+      if (selfEvals.length === 0) {
+        selfContainer.innerHTML = `<p style="color: #666; font-style: italic;">No self-assessment entries submitted yet by ${selectedStudent.fullName}.</p>`;
+      } else {
+        let selfHtml = `
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Skill / Competency Assessed</th>
+                <th>Self Rating</th>
+                <th>Learner Reflection / Key Learnings</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+        selfEvals.forEach(item => {
+          selfHtml += `
+            <tr>
+              <td>${item.date || '---'}</td>
+              <td>${item.skill || item.activity || item.procedure || '---'}</td>
+              <td><strong>${item.rating || item.expectations || 'Recorded'}</strong></td>
+              <td>${item.reflection || item.notes || [item.gain ? `Skills: ${item.gain}` : '', item.challenges ? `Challenges: ${item.challenges}` : ''].filter(Boolean).join('<br>') || '---'}</td>
+            </tr>
+          `;
+        });
+        selfHtml += `</tbody></table>`;
+        selfContainer.innerHTML = selfHtml;
+      }
+
+      // Load existing Supervisor Evaluation if previously saved
+      if (selectedStudent.supervisorEval) {
+        const ev = selectedStudent.supervisorEval;
+        document.getElementById('supervisorName').value = ev.supervisorInfo?.name || ev.supervisorName || selectedStudent.sd_company?.superName || '';
+        document.getElementById('supervisorPhone').value = ev.supervisorInfo?.phone || ev.supervisorPhone || selectedStudent.sd_company?.superPhone || '';
+        document.getElementById('supervisorEmail').value = ev.supervisorInfo?.email || ev.supervisorEmail || selectedStudent.sd_company?.email || '';
+        document.getElementById('evTechRoutines').value = ev.techRoutines || 0;
+        document.getElementById('evTechTools').value = ev.techTools || 0;
+        document.getElementById('evAttIndividual').value = ev.attIndividual || 0;
+        document.getElementById('evAttInteractive').value = ev.attInteractive || 0;
+        document.getElementById('evAttOrg').value = ev.attOrg || 0;
+        document.getElementById('evAttRules').value = ev.attRules || 0;
+        document.getElementById('evQuality').value = ev.quality || 0;
+        document.getElementById('evComments').value = ev.remarks || ev.comments || '';
+
+        document.getElementById('totalScore').innerText = ev.totalRaw || 0;
+        document.getElementById('totalPercentage').innerText = (ev.totalRaw || 0) + "%";
+        document.getElementById('totalWeight').innerText = `Weighted Supervisor Contribution (50%): ${(ev.weightedScore || 0).toFixed(1)} / 50 Marks`;
+        document.getElementById('evalResult').style.display = 'block';
+      }
+
+      // Load the teacher / academic evaluation and combined final result.
+      renderTeacherEvaluationOnSupervisorPortal();
+      updateSupervisorFinalResult();
+    });
+
+    function calculateEvaluation() {
+      const supervisorName = document.getElementById('supervisorName').value.trim();
+      const supervisorPhone = document.getElementById('supervisorPhone').value.trim();
+      const supervisorEmail = document.getElementById('supervisorEmail').value.trim();
+
+      if (!supervisorName) {
+        alert('⚠️ Please enter the Supervisor Name before saving evaluation marks!');
+        return;
+      }
+
+      const techRoutines = parseFloat(document.getElementById('evTechRoutines').value) || 0;
+      const techTools = parseFloat(document.getElementById('evTechTools').value) || 0;
+      const attIndividual = parseFloat(document.getElementById('evAttIndividual').value) || 0;
+      const attInteractive = parseFloat(document.getElementById('evAttInteractive').value) || 0;
+      const attOrg = parseFloat(document.getElementById('evAttOrg').value) || 0;
+      const attRules = parseFloat(document.getElementById('evAttRules').value) || 0;
+      const quality = parseFloat(document.getElementById('evQuality').value) || 0;
+      const remarks = document.getElementById('evComments').value.trim();
+
+      const totalRaw = techRoutines + techTools + attIndividual + attInteractive + attOrg + attRules + quality;
+      const weightedScore = (totalRaw / 100) * 50;
+
+      document.getElementById('totalScore').innerText = totalRaw;
+      document.getElementById('totalPercentage').innerText = totalRaw + "%";
+      document.getElementById('totalWeight').innerText = `Weighted Supervisor Contribution (50%): ${weightedScore.toFixed(1)} / 50 Marks`;
+      document.getElementById('evalResult').style.display = 'block';
+
+      selectedStudent.supervisorEval = {
+        techRoutines, techTools, attIndividual, attInteractive, attOrg, attRules, quality,
+        totalRaw, weightedScore, remarks, supervisorName, supervisorPhone, supervisorEmail,
+        supervisorInfo: { name: supervisorName, phone: supervisorPhone, email: supervisorEmail },
+        evalDate: new Date().toISOString().slice(0, 10),
+        weighted50: weightedScore
+      };
+
+      const allUsers = JSON.parse(localStorage.getItem('rw_registered_users')) || [];
+      const targetCode = selectedStudent.code || selectedStudent.registrationCode || selectedStudent.studentCode;
+      const index = allUsers.findIndex(u => (u.code || u.registrationCode || u.studentCode) === targetCode);
+
+      if (index !== -1) {
+        allUsers[index] = selectedStudent;
+        localStorage.setItem('rw_registered_users', JSON.stringify(allUsers));
+      }
+
+      // Sync active session if evaluating self
+      const currentUser = JSON.parse(localStorage.getItem('rw_current_user'));
+      if (currentUser && (currentUser.code || currentUser.registrationCode) === targetCode) {
+        localStorage.setItem('rw_current_user', JSON.stringify(selectedStudent));
+      }
+
+      // Inter-file synchronization: make this student's supervisor evaluation
+      // available directly to the Dashboard, including marks, comments and supervisor identity.
+      localStorage.setItem(`rw_supervisor_eval_data_${targetCode}`, JSON.stringify({
+        studentCode: targetCode,
+        ...selectedStudent.supervisorEval
+      }));
+      localStorage.setItem('rw_supervisor_eval_data', JSON.stringify({
+        studentCode: targetCode,
+        ...selectedStudent.supervisorEval
+      }));
+
+      const finalSupervisor = parseFloat(selectedStudent.supervisorEval?.weightedScore || selectedStudent.supervisorEval?.weighted50 || 0) || 0;
+      const finalAcademic = parseFloat(selectedStudent.academicEval?.weightedScore || selectedStudent.academicEval?.weighted50 || 0) || 0;
+      selectedStudent.finalResult = {
+        supervisorContribution: finalSupervisor,
+        academicContribution: finalAcademic,
+        finalScore: finalSupervisor + finalAcademic,
+        percentage: finalSupervisor + finalAcademic,
+        supervisorComment: selectedStudent.supervisorEval?.remarks || selectedStudent.supervisorEval?.comments || '',
+        teacherComment: selectedStudent.academicEval?.comments || '',
+        supervisorInfo: selectedStudent.supervisorEval.supervisorInfo || {},
+        teacherInfo: selectedStudent.academicEval?.teacherInfo || {},
+        updatedAt: new Date().toISOString()
+      };
+      const finalUsers = JSON.parse(localStorage.getItem('rw_registered_users')) || [];
+      const finalIndex = finalUsers.findIndex(u => (u.code || u.registrationCode || u.studentCode) === targetCode);
+      if (finalIndex !== -1) {
+        finalUsers[finalIndex] = selectedStudent;
+        localStorage.setItem('rw_registered_users', JSON.stringify(finalUsers));
+      }
+      localStorage.setItem(`rw_final_result_${targetCode}`, JSON.stringify(selectedStudent.finalResult));
+
+      renderTeacherEvaluationOnSupervisorPortal();
+      updateSupervisorFinalResult();
+      alert(`✅ Supervisor Evaluation Marks Saved successfully for ${selectedStudent.fullName}!`);
+    }
+
+
+
+    function renderTeacherEvaluationOnSupervisorPortal() {
+      if (!selectedStudent) return;
+      const ac = selectedStudent.academicEval || selectedStudent.sd_acad_eval || {};
+      const teacher = ac.teacherInfo || {};
+      document.getElementById('teacherResultName').innerText = ac.teacherName || teacher.fullName || teacher.name || 'Not Recorded';
+      document.getElementById('teacherResultCode').innerText = ac.camisCode || teacher.code || 'Not Recorded';
+      document.getElementById('teacherResultPhone').innerText = ac.teacherPhone || teacher.phone || 'Not Recorded';
+      document.getElementById('teacherResultDate').innerText = ac.evalDate || 'Recorded';
+      document.getElementById('teacherMarkLogbook').value = ac.logbook ?? 0;
+      document.getElementById('teacherMarkAttendance').value = ac.attendance ?? 0;
+      document.getElementById('teacherMarkSelfReport').value = ac.selfReport ?? 0;
+      document.getElementById('teacherMarkVisiting').value = ac.visiting ?? 0;
+      document.getElementById('teacherMarkReport').value = ac.report ?? 0;
+      document.getElementById('teacherMarkDefense').value = ac.defense ?? 0;
+      document.getElementById('teacherMarkMastery').value = ac.mastery ?? 0;
+      document.getElementById('teacherResultComments').value = ac.comments || '';
+      document.getElementById('teacherResultWeighted').innerText = `${parseFloat(ac.weightedScore || ac.weighted50 || 0).toFixed(1)} / 50`;
+    }
+
+    function updateSupervisorFinalResult() {
+      if (!selectedStudent) return;
+      const supervisor = selectedStudent.supervisorEval || {};
+      const academic = selectedStudent.academicEval || {};
+      const supervisorScore = parseFloat(supervisor.weightedScore || supervisor.weighted50 || 0) || 0;
+      const academicScore = parseFloat(academic.weightedScore || academic.weighted50 || 0) || 0;
+      const finalScore = supervisorScore + academicScore;
+
+      document.getElementById('finalSupervisorContribution').innerText = `${supervisorScore.toFixed(1)} / 50`;
+      document.getElementById('finalAcademicContribution').innerText = `${academicScore.toFixed(1)} / 50`;
+      document.getElementById('finalCombinedScore').innerText = `${finalScore.toFixed(1)}%`;
+
+      const status = document.getElementById('finalCombinedStatus');
+      if (finalScore >= 50) {
+        status.innerText = 'PASSED / COMPETENT';
+        status.style.color = '#208C44';
+      } else if (finalScore > 0) {
+        status.innerText = 'NEEDS RE-ASSESSMENT';
+        status.style.color = '#dc3545';
+      } else {
+        status.innerText = 'PENDING';
+        status.style.color = '#6c757d';
+      }
+    }
+
+    function editEvaluation() {
+      document.getElementById('evTechRoutines').focus();
+    }
+    window.addEventListener('storage', (event) => {
+      if (!event.key || event.key.startsWith('rw_')) {
+        const selectedCode = localStorage.getItem('rw_selected_student_code');
+        const allUsers = JSON.parse(localStorage.getItem('rw_registered_users')) || [];
+        if (selectedCode) {
+          const fresh = allUsers.find(u => (u.code || u.registrationCode || u.studentCode) === selectedCode);
+          if (fresh) {
+            selectedStudent = fresh;
+            renderTeacherEvaluationOnSupervisorPortal();
+            updateSupervisorFinalResult();
+            window.location.reload();
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,2772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Industrial Attachment Logbook Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    :root {
+      --rw-blue: #00A3E0;
+      --rw-green: #208C44;
+      --rw-yellow: #FAD105;
+      --dark-blue: #003366;
+      --bg-light: #F4F7F6;
+      --white: #FFFFFF;
+      --text-dark: #333333;
+      --border-color: #E0E0E0;
+      --danger: #D9534F;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* 1. RWANDA TRI-COLOR BRAND ACCENT BAR */
+    body::before {
+      content: '';
+      display: block;
+      height: 6px;
+      background: linear-gradient(to right, var(--rw-blue) 45%, var(--rw-yellow) 45% 70%, var(--rw-green) 70%);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+
+    body {
+      background-color: var(--bg-light);
+      color: var(--text-dark);
+      padding: 20px;
+      padding-top: 26px; /* Offset for top brand bar */
+    }
+
+    header {
+      background-color: var(--dark-blue);
+      color: var(--white);
+      padding: 20px;
+      border-radius: 8px 8px 0 0;
+      border-bottom: 5px solid var(--rw-yellow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .logout-btn {
+      background-color: var(--rw-yellow);
+      color: var(--dark-blue);
+      border: none;
+      padding: 8px 16px;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .logout-btn:hover {
+      background-color: #e0b800;
+    }
+
+    .print-btn {
+      background-color: var(--rw-blue);
+      color: var(--white);
+      border: none;
+      padding: 8px 16px;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .print-btn:hover {
+      background-color: #0082b3;
+    }
+
+    /* PROFILE BANNER */
+    .profile-card {
+      background-color: var(--white);
+      padding: 20px;
+      border-radius: 0 0 8px 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      border-left: 6px solid var(--rw-green);
+    }
+
+    .profile-card img {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--rw-blue);
+    }
+
+    .profile-info h2 {
+      color: var(--dark-blue);
+      margin-bottom: 5px;
+    }
+
+    .profile-info p {
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+      color: #555;
+    }
+
+    .practice-inst-box {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .practice-inst-box input {
+      padding: 6px 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      width: 250px;
+    }
+
+    /* QUICK STATS CARDS */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--white);
+      padding: 15px 20px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border-left: 4px solid var(--rw-blue);
+    }
+
+    .stat-icon {
+      font-size: 2rem;
+    }
+
+    .stat-card h4 {
+      font-size: 1.3rem;
+      color: var(--dark-blue);
+      margin: 0;
+    }
+
+    .stat-card p {
+      font-size: 0.85rem;
+      color: #666;
+      margin: 0;
+    }
+
+    /* TABS NAV */
+    .tabs-nav {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--border-color);
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background-color: #E9ECEF;
+      border: none;
+      padding: 12px 20px;
+      font-weight: 600;
+      color: #555;
+      cursor: pointer;
+      border-radius: 6px 6px 0 0;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background-color: var(--rw-blue);
+      color: var(--white);
+    }
+
+    .tab-content {
+      display: none;
+      background-color: var(--white);
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* FORMS & INPUTS */
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: var(--dark-blue);
+    }
+
+    .form-group input, 
+    .form-group select, 
+    .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 0.95rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 15px;
+    }
+
+    .btn-submit {
+      background-color: var(--rw-green);
+      color: var(--white);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-submit:hover {
+      background-color: #196f35;
+    }
+
+    .btn-edit {
+      background-color: var(--rw-blue);
+      color: var(--white);
+      border: none;
+      padding: 5px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+      margin-right: 5px;
+    }
+
+    .btn-edit:hover {
+      background-color: #0082b3;
+    }
+
+    /* SEARCHABLE DROPDOWN */
+    .search-proc-wrapper {
+      position: relative;
+    }
+
+    .proc-dropdown-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--white);
+      border: 1px solid var(--border-color);
+      border-radius: 0 0 4px 4px;
+      max-height: 250px;
+      overflow-y: auto;
+      z-index: 100;
+      display: none;
+      list-style: none;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .proc-dropdown-list li {
+      padding: 10px;
+      cursor: pointer;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 0.9rem;
+    }
+
+    .proc-dropdown-list li:hover {
+      background-color: #F0F8FF;
+    }
+
+    /* TABLES & DISPLAY CARDS WITH ALTERNATING & HOVER ROW STYLES */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    table th, table td {
+      border: 1px solid var(--border-color);
+      padding: 10px;
+      text-align: left;
+    }
+
+    table th {
+      background-color: var(--dark-blue);
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #F9FBFD;
+    }
+
+    tbody tr:hover {
+      background-color: #EBF5FF;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-delete {
+      background-color: var(--danger);
+      color: var(--white);
+      border: none;
+      padding: 5px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .saved-info-display {
+      margin-top: 15px;
+      margin-bottom: 20px;
+      padding: 18px;
+      background: #F8F9FA;
+      border-left: 5px solid var(--rw-blue);
+      border-radius: 6px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+
+    .saved-info-display h4 {
+      color: var(--dark-blue);
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .saved-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+    }
+
+    .saved-info-grid div {
+      font-size: 0.95rem;
+    }
+
+    .saved-info-grid strong {
+      color: #555;
+    }
+
+    /* BADGES & CONTROLS */
+    .status-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    .badge-verified {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .badge-pending {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+
+    .table-filter-bar {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .table-filter-bar input,
+    .table-filter-bar select {
+      padding: 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+
+    /* READONLY NOTICE BANNER */
+    .readonly-notice {
+      background-color: #E2F0D9;
+      color: #1E4620;
+      border: 1px solid #B2D8B2;
+      padding: 12px 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* FLOATING BACK TO TOP BUTTON */
+    #scrollTopBtn {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--dark-blue);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      z-index: 999;
+      transition: opacity 0.2s ease;
+    }
+
+    #scrollTopBtn:hover {
+      background-color: var(--rw-blue);
+    }
+
+    /* CERTIFICATE STYLES */
+    .certificate-container {
+      background: #ffffff;
+      border: 12px solid var(--dark-blue);
+      padding: 30px;
+      position: relative;
+      text-align: center;
+      margin: 20px auto;
+      max-width: 900px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.15);
+    }
+
+    .cert-border-inner {
+      border: 2px dashed var(--rw-yellow);
+      padding: 30px;
+    }
+
+    .cert-title {
+      font-family: 'Georgia', serif;
+      font-size: 2.2rem;
+      color: var(--dark-blue);
+      text-transform: uppercase;
+      margin-top: 15px;
+      letter-spacing: 1px;
+    }
+
+    .cert-subtitle {
+      font-size: 1.1rem;
+      color: #555;
+      margin-bottom: 25px;
+      font-style: italic;
+    }
+
+    .cert-body {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: #333;
+      margin: 20px 0;
+    }
+
+    .cert-recipient {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--rw-green);
+      text-decoration: underline;
+      margin: 10px 0;
+    }
+
+    .cert-signatures {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 50px;
+      padding: 0 20px;
+    }
+
+    .cert-sig-box {
+      width: 40%;
+      text-align: center;
+    }
+
+    .cert-sig-line {
+      border-bottom: 1px solid #333;
+      margin-bottom: 5px;
+    }
+
+    /* PRINT MEDIA & OFFICIAL SIGNATURE STAMP STYLES */
+    .print-signature-section {
+      display: none;
+    }
+
+    @media print {
+      @page {
+        size: A4 landscape;
+        margin: 5mm;
+      }
+
+      html, body {
+        width: 287mm !important;
+        height: 200mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        background: #fff !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      body * { visibility: hidden; }
+      #tab-cert, #tab-cert * { visibility: visible; }
+
+      #tab-cert {
+        position: fixed !important;
+        inset: 0 !important;
+        width: 287mm !important;
+        height: 200mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-sizing: border-box !important;
+        display: block !important;
+        overflow: hidden !important;
+      }
+
+      .certificate-container {
+        width: 287mm !important;
+        max-width: none !important;
+        height: 200mm !important;
+        margin: 0 !important;
+        padding: 5mm !important;
+        border: 2mm solid var(--dark-blue) !important;
+        box-shadow: none !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+
+      .cert-border-inner {
+        width: 100% !important;
+        height: 100% !important;
+        padding: 4mm !important;
+        border-width: 1px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+      }
+
+      .cert-border-inner h2 {
+        font-size: 14pt !important;
+        letter-spacing: 1px !important;
+        margin: 0 0 1mm !important;
+      }
+      .cert-border-inner > p:first-of-type {
+        font-size: 9pt !important;
+        margin: 0 0 1mm !important;
+      }
+      #certSchoolLogoWrap {
+        margin: 1mm auto !important;
+      }
+      #certSchoolLogo {
+        max-width: 22mm !important;
+        max-height: 15mm !important;
+      }
+      .cert-title {
+        font-size: 22pt !important;
+        line-height: 1.1 !important;
+        margin: 1mm 0 !important;
+        letter-spacing: .5px !important;
+      }
+      .cert-subtitle {
+        font-size: 10pt !important;
+        margin: 0 0 1mm !important;
+      }
+      .cert-body {
+        font-size: 9pt !important;
+        line-height: 1.25 !important;
+        margin: 1.5mm 0 !important;
+      }
+      .cert-recipient {
+        font-size: 16pt !important;
+        line-height: 1.1 !important;
+        margin: 1mm 0 !important;
+        overflow-wrap: anywhere !important;
+      }
+      #certAccomplishmentLevel { font-size: 10pt !important; }
+      #certTrade {
+        font-size: 12pt !important;
+        margin: 1mm 0 !important;
+      }
+      #certificateQrSection {
+        max-width: none !important;
+        margin: 1mm auto !important;
+      }
+      #certificateQrCode {
+        min-height: 0 !important;
+      }
+      #certificateQrCode img,
+      #certificateQrCode canvas {
+        width: 22mm !important;
+        height: 22mm !important;
+        max-width: 22mm !important;
+        max-height: 22mm !important;
+      }
+      #certificateQrSection p {
+        font-size: 6.5pt !important;
+        margin: 1mm 0 0 !important;
+      }
+      .cert-signatures {
+        width: 90% !important;
+        margin: 2mm 0 0 !important;
+        padding: 0 !important;
+        gap: 20mm !important;
+        justify-content: space-around !important;
+      }
+      .cert-sig-box {
+        width: 42% !important;
+        font-size: 8pt !important;
+      }
+      .cert-sig-box p {
+        font-size: 8pt !important;
+        margin: 1mm 0 !important;
+      }
+      .cert-sig-line { margin-bottom: 1mm !important; }
+
+      .no-print, .print-signature-section, #scrollTopBtn {
+        display: none !important;
+        visibility: hidden !important;
+      }
+    }
+
+    /* MODAL OVERLAY BASE & DISPLAY TOGGLE */
+    .modal-overlay {
+      display: none; 
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-overlay.active {
+      display: flex !important;
+    }
+
+    .modal-content {
+      background: #ffffff;
+      width: 90%;
+      max-width: 500px;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+      border-top: 5px solid var(--rw-blue, #00A3E0);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #666;
+    }
+
+    .close-modal:hover {
+      color: #000;
+    }
+
+    .form-group input[readonly],
+    .form-group textarea[readonly] {
+      background-color: #e9ecef;
+      color: #495057;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Rwanda TVET / Practical Logbook</h1>
+    <div class="header-actions">
+      <button class="print-btn" onclick="window.print()">🖨️ Print / PDF</button>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+  <div class="profile-card">
+    <img id="userPhoto" src="https://via.placeholder.com/90" alt="Student Photo">
+    <div class="profile-info">
+      <h2 id="userName">Student Learner</h2>
+      <p><strong>School:</strong> <span id="userSchool">Training Institution</span></p>
+      <p><strong>Trade / Option:</strong> <span id="userTrade">General Student</span></p>
+      <p><strong>Registration Code:</strong> <span id="userCode">00000000002</span></p>
+      <p><strong>Practice Institution:</strong> <span id="userPracticeInst">Not Specified</span></p>
+      
+      <div class="practice-inst-box">
+        <input type="text" id="practiceInput" placeholder="Enter Company / Health Center Name">
+        <button class="btn-submit" onclick="savePracticeInstitution()">Save Institution</button>
+      </div>
+      <div style="margin-top: 10px;">
+        <button type="button" class="btn-edit" onclick="openEditProfileModal()">
+         ✏️ Edit Identification
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUICK STATS CARDS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span class="stat-icon">⏱️</span>
+      <div>
+        <h4 id="statTotalHours">0 hrs</h4>
+        <p>Total Hours Logged</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon">📋</span>
+      <div>
+        <h4 id="statTotalEntries">0</h4>
+        <p>Recorded Procedures</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon">✅</span>
+      <div>
+        <h4 id="statVerified">0</h4>
+        <p>Verified Entries</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs-nav">
+    <button class="tab-btn active" onclick="switchTab(event, 'tab-tasks')">Daily Tasks / Procedures</button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-attendance')">Attendance Record</button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-company')">Institution / Field Info</button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-self')">Self Assessment</button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-eval')">Supervisor Evaluation</button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-academic')">Academic Evaluation</button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-final')">Final Result</button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-cert')">📜 Attachment Certificate</button>
+  </div>
+
+  <!-- TAB: TASKS / PROCEDURES -->
+  <div id="tab-tasks" class="tab-content active">
+    <h3 id="taskSectionHeader">🛠️ Record Daily/Weekly Activity</h3>
+    <br>
+    
+    <div class="form-group" style="max-width: 300px;">
+      <label id="studentLevelLabel">Academic Class / Level:</label>
+      <select id="studentLevel" onchange="filterProceduresByLevel()">
+        <!-- Options populated dynamically based on student trade -->
+      </select>
+      <small id="levelInfo" style="color: var(--rw-green); font-weight: bold;"></small>
+    </div>
+
+    <form id="taskEntryForm">
+      <input type="hidden" id="editingTaskId" value="">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Week #</label>
+          <input type="number" id="taskWeek" min="1" max="52" value="1" required>
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="taskDate" required>
+        </div>
+        <div class="form-group">
+          <label>Hours Spent</label>
+          <input type="number" id="taskHours" step="0.5" min="0.5" value="2" required>
+        </div>
+      </div>
+
+      <div class="form-group search-proc-wrapper">
+        <label>Search & Select Practical Competence / Procedure:</label>
+        <input type="text" id="procSearchInput" placeholder="Click or start typing procedure name..." autocomplete="off" required>
+        <ul id="procDropdownList" class="proc-dropdown-list"></ul>
+      </div>
+
+      <div class="form-group" id="customProcGroup" style="display: none;">
+        <label>Specify Custom Procedure / Activity:</label>
+        <input type="text" id="customProcInput" placeholder="Type custom procedure name...">
+      </div>
+
+      <div class="form-group">
+        <label>Detailed Description of Activity Executed:</label>
+        <textarea id="taskDescription" rows="3" placeholder="Explain how you performed the task..." required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Tools & Equipment Used:</label>
+        <input type="text" id="taskTools" placeholder="e.g., Stethoscope, Multimeter, VS Code, Safety Helmet" required>
+      </div>
+
+      <div class="form-group" style="background: #f8f9fa; padding: 12px; border: 1px solid var(--border-color); border-radius: 6px;">
+        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+          <input type="checkbox" id="taskSupervised" style="width: auto;" onchange="toggleSupervisionFields()">
+          <strong>Performed Under Direct Supervision?</strong>
+        </label>
+      </div>
+
+      <div id="supervisionDetailsGroup" style="display: none; background: #eef4f9; padding: 15px; border-left: 4px solid var(--rw-blue); border-radius: 4px; margin-bottom: 15px;">
+        <h4 style="margin-bottom: 10px; color: var(--dark-blue);">👨‍⚕️ Field Supervisor Sign-Off</h4>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Supervisor Name & Title:</label>
+            <input type="text" id="taskSuperName" placeholder="e.g., RN Uwimana Claire">
+          </div>
+          <div class="form-group">
+            <label>Phone Number:</label>
+            <input type="tel" id="taskSuperPhone" placeholder="e.g., 078XXXXXXX">
+          </div>
+          <div class="form-group">
+            <label>Email Address:</label>
+            <input type="email" id="taskSuperEmail" placeholder="e.g., claire@hospital.rw">
+          </div>
+          <div class="form-group">
+            <label>Supervisor Signature / Verification Code:</label>
+            <input type="text" id="taskSuperSign" placeholder="e.g., SIG-RN-88214">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Supervisor Comments / Feedback:</label>
+          <textarea id="taskSuperComment" rows="2" placeholder="e.g., Trainee performed procedure with excellent technique."></textarea>
+        </div>
+      </div>
+
+      <button type="submit" id="taskSubmitBtn" class="btn-submit">Add Log Entry</button>
+      <button type="button" id="taskCancelBtn" class="btn-delete" style="display: none; margin-left: 10px;" onclick="resetTaskForm()">Cancel Edit</button>
+    </form>
+
+    <hr style="margin: 30px 0;">
+
+    <h3>Logged Activities Record</h3>
+
+    <div class="table-filter-bar">
+      <input type="text" id="taskSearchFilter" placeholder="Search entries..." onkeyup="renderTasks()">
+      <select id="taskWeekFilter" onchange="renderTasks()">
+        <option value="">All Weeks</option>
+        <option value="1">Week 1</option>
+        <option value="2">Week 2</option>
+        <option value="3">Week 3</option>
+        <option value="4">Week 4</option>
+        <option value="5">Week 5</option>
+        <option value="6">Week 6</option>
+      </select>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>Week</th>
+          <th>Date</th>
+          <th>Procedure / Competence</th>
+          <th>Description</th>
+          <th>Tools</th>
+          <th>Supervised By</th>
+          <th>Status</th>
+          <th>Hours</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="tasksTableBody">
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TAB: ATTENDANCE -->
+  <div id="tab-attendance" class="tab-content">
+    <h3>📅 Daily Attendance Log</h3>
+    <p style="color: #666; font-size: 0.9rem; margin-top: 4px; margin-bottom: 15px;">
+      ℹ️ Note: Attendance can only be recorded for today or past days. Future dates are restricted.
+    </p>
+    <form id="attendanceForm" class="form-grid">
+      <input type="hidden" id="editingAttId" value="">
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="attDate" required>
+      </div>
+      <div class="form-group">
+        <label>Time In</label>
+        <input type="time" id="attTimeIn" required>
+      </div>
+      <div class="form-group">
+        <label>Time Out</label>
+        <input type="time" id="attTimeOut" required>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="attStatus">
+          <option value="Present">Present</option>
+          <option value="Absent (Excused)">Absent (Excused)</option>
+          <option value="Absent (Unexcused)">Absent (Unexcused)</option>
+        </select>
+      </div>
+      <div class="form-group" style="grid-column: 1 / -1; display: flex; gap: 10px;">
+        <button type="submit" id="attSubmitBtn" class="btn-submit">Log Attendance</button>
+        <button type="button" id="attCancelBtn" class="btn-delete" style="display: none;" onclick="resetAttendanceForm()">Cancel Edit</button>
+      </div>
+    </form>
+
+    <hr style="margin: 30px 0;">
+
+    <h3>Saved Attendance Records</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time In</th>
+          <th>Time Out</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="attendanceTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- TAB: COMPANY / FIELD INFO -->
+  <div id="tab-company" class="tab-content">
+    <h3>🏥 Organization / Attachment Details</h3>
+    <br>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Institution / Company Name</label>
+        <input type="text" id="compName">
+      </div>
+      <div class="form-group">
+        <label>Phone Contact</label>
+        <input type="text" id="compPhone">
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="compEmail">
+      </div>
+      <div class="form-group">
+        <label>District</label>
+        <input type="text" id="compDistrict">
+      </div>
+      <div class="form-group">
+        <label>Sector</label>
+        <input type="text" id="compSector">
+      </div>
+      <div class="form-group">
+        <label>Trade Field / Department</label>
+        <select id="compTrade"></select>
+      </div>
+      <div class="form-group">
+        <label>Field Mentor / Supervisor Name</label>
+        <input type="text" id="superName">
+      </div>
+      <div class="form-group">
+        <label>Supervisor Contact Phone</label>
+        <input type="text" id="superPhone">
+      </div>
+    </div>
+    <button class="btn-submit" onclick="saveCompanyDetails()">Save Information</button>
+
+    <div id="companyDisplayCard" class="saved-info-display" style="display: none;">
+      <h4>
+        <span>📌 Saved Institution Details</span>
+        <button class="btn-edit" onclick="editCompanyDetails()">✏️ Edit Info</button>
+      </h4>
+      <div class="saved-info-grid">
+        <div><strong>Institution Name:</strong> <span id="dispCompName">-</span></div>
+        <div><strong>Phone:</strong> <span id="dispCompPhone">-</span></div>
+        <div><strong>Email:</strong> <span id="dispCompEmail">-</span></div>
+        <div><strong>District:</strong> <span id="dispCompDistrict">-</span></div>
+        <div><strong>Sector:</strong> <span id="dispCompSector">-</span></div>
+        <div><strong>Trade Field:</strong> <span id="dispCompTrade">-</span></div>
+        <div><strong>Supervisor:</strong> <span id="dispSuperName">-</span></div>
+        <div><strong>Supervisor Phone:</strong> <span id="dispSuperPhone">-</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: SELF ASSESSMENT -->
+  <div id="tab-self" class="tab-content">
+    <h3>📝 Trainee Self-Assessment per Procedure</h3>
+    <br>
+    <form id="selfAssessmentForm">
+      <input type="hidden" id="editingSelfId" value="">
+      <div class="form-group search-proc-wrapper">
+        <label>Select Procedure for Self Assessment:</label>
+        <input type="text" id="selfProcSearchInput" placeholder="Click or type procedure name..." autocomplete="off" required>
+        <ul id="selfProcDropdownList" class="proc-dropdown-list"></ul>
+      </div>
+
+      <div class="form-group" id="selfCustomProcGroup" style="display: none;">
+        <label>Specify Custom Procedure / Task:</label>
+        <input type="text" id="selfCustomProcInput" placeholder="Type custom procedure name...">
+      </div>
+
+      <div class="form-group">
+        <label>To what extent were your attachment expectations met for this procedure?</label>
+        <select id="selfExpectations">
+          <option value="All expectations met">All expectations were met</option>
+          <option value="Most expectations met">Most expectations were met</option>
+          <option value="Some expectations met">Some expectations were met</option>
+          <option value="Expectations not met">Expectations were not met</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Key Skills & Competences Acquired:</label>
+        <textarea id="selfGain" rows="3" placeholder="Detail the procedures and skills you mastered..." required></textarea>
+      </div>
+      <div class="form-group">
+        <label>Challenges Experienced & Solutions Found:</label>
+        <textarea id="selfChallenges" rows="3" placeholder="Describe any challenges faced during field placement..." required></textarea>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button type="submit" id="selfSubmitBtn" class="btn-submit">Save Self Assessment</button>
+        <button type="button" id="selfCancelBtn" class="btn-delete" style="display: none;" onclick="resetSelfForm()">Cancel Edit</button>
+      </div>
+    </form>
+
+    <hr style="margin: 30px 0;">
+
+    <h3>Saved Self-Assessments</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>Procedure / Task</th>
+          <th>Expectations Met</th>
+          <th>Skills / Competences Acquired</th>
+          <th>Challenges & Solutions</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="selfTableBody">
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TAB: SUPERVISOR EVALUATION -->
+  <div id="tab-eval" class="tab-content">
+    <h3>📋 Industrial / Field Supervisor Assessment (50%)</h3>
+    <br>
+    
+    <div class="readonly-notice">
+      <span>🔒 <strong>Read-Only View:</strong> Scores and remarks are recorded directly by your Industry Supervisor in their assessment file and displayed here automatically. Students cannot alter these marks.</span>
+    </div>
+
+    <div class="saved-info-display" style="border-left-color: var(--rw-green);">
+      <h4><span>👨‍⚕️ Field Supervisor & Practice Details</span></h4>
+      <div class="saved-info-grid">
+        <div><strong>Supervisor Name:</strong> <span id="evalSuperName">Not Specified</span></div>
+        <div><strong>Phone Contact:</strong> <span id="evalSuperPhone">Not Specified</span></div>
+        <div><strong>Email Address:</strong> <span id="evalSuperEmail">Not Specified</span></div>
+        <div><strong>Practice Institution:</strong> <span id="evalSuperInst">Not Specified</span></div>
+        <div><strong>District / Sector:</strong> <span id="evalSuperLoc">Not Specified</span></div>
+        <div><strong>Verification Code:</strong> <span id="evalSuperCode" style="color: var(--rw-green); font-weight: bold;">Verified</span></div>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>1. Execution of Technical Routines (0-15)</label>
+        <input type="number" id="evTechRoutines" readonly>
+      </div>
+      <div class="form-group">
+        <label>2. Proper Use of Tools & Equipment (0-15)</label>
+        <input type="number" id="evTechTools" readonly>
+      </div>
+      <div class="form-group">
+        <label>3. Individual Work Autonomy & Initiative (0-10)</label>
+        <input type="number" id="evAttIndividual" readonly>
+      </div>
+      <div class="form-group">
+        <label>4. Teamwork & Interpersonal Communication (0-15)</label>
+        <input type="number" id="evAttInteractive" readonly>
+      </div>
+      <div class="form-group">
+        <label>5. Organization & Time Management (0-15)</label>
+        <input type="number" id="evAttOrg" readonly>
+      </div>
+      <div class="form-group">
+        <label>6. Professional Ethics & Work Rules (0-15)</label>
+        <input type="number" id="evAttRules" readonly>
+      </div>
+      <div class="form-group">
+        <label>7. Quality & Cleanliness of Work Done (0-15)</label>
+        <input type="number" id="evQuality" readonly>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Supervisor's General Comments:</label>
+      <textarea id="evComments" rows="3" readonly placeholder="No comments provided yet."></textarea>
+    </div>
+
+    <div id="evalResult" style="margin-top: 20px; padding: 15px; background: #eef9f1; border-left: 5px solid var(--rw-green);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+        <h4>Supervisor Score: <span id="totalScore">0</span> / 100 (<span id="totalPercentage">0%</span>)</h4>
+      </div>
+      <p id="totalWeight" style="font-weight: bold; color: var(--dark-blue);"></p>
+    </div>
+  </div>
+
+  <!-- TAB: ACADEMIC EVALUATION -->
+  <div id="tab-academic" class="tab-content">
+    <h3>🎓 Academic Evaluator / School Assessor Assessment (50%)</h3>
+    <br>
+
+    <div class="readonly-notice">
+      <span>🔒 <strong>Read-Only View:</strong> Scores and remarks are recorded directly by your School Assessor/Teacher. The supervisor's registration data is permanently preserved so you can verify the evaluating teacher even in cases of reclamation.</span>
+    </div>
+
+    <div class="saved-info-display">
+      <h4><span>👨‍🏫 Evaluating Teacher / Assessor Details</span></h4>
+      <div class="saved-info-grid">
+        <div><strong>Teacher / Assessor Name:</strong> <span id="acadTeacherName">Not Recorded</span></div>
+        <div><strong>Institution / School:</strong> <span id="acadTeacherSchool">Not Recorded</span></div>
+        <div><strong>Phone Contact:</strong> <span id="acadTeacherPhone">Not Recorded</span></div>
+        <div><strong>Email Address:</strong> <span id="acadTeacherEmail">Not Recorded</span></div>
+        <div><strong>Assessor Code / ID:</strong> <span id="acadTeacherCode" style="color: var(--rw-blue); font-weight: bold;">Not Recorded</span></div>
+        <div><strong>Assessment Date:</strong> <span id="acadEvalDate">Pending</span></div>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>1. Logbook Quality & Daily Records (0-15)</label>
+        <input type="number" id="acLogbook" readonly>
+      </div>
+      <div class="form-group">
+        <label>2. Attendance & Log Accuracy (0-15)</label>
+        <input type="number" id="acAttendance" readonly>
+      </div>
+      <div class="form-group">
+        <label>3. Quality of Trainee Self-Assessment (0-10)</label>
+        <input type="number" id="acSelfReport" readonly>
+      </div>
+      <div class="form-group">
+        <label>4. Institutional Visiting Assessor Review (0-15)</label>
+        <input type="number" id="acVisiting" readonly>
+      </div>
+      <div class="form-group">
+        <label>5. Organization & Field Report Structure (0-15)</label>
+        <input type="number" id="acReport" readonly>
+      </div>
+      <div class="form-group">
+        <label>6. Logbook Defense / Oral Examination (0-15)</label>
+        <input type="number" id="acDefense" readonly>
+      </div>
+      <div class="form-group">
+        <label>7. Mastery of Acquired Competences (0-15)</label>
+        <input type="number" id="acMastery" readonly>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Academic Evaluator's General Comments:</label>
+      <textarea id="acComments" rows="3" readonly placeholder="No comments recorded yet."></textarea>
+    </div>
+
+    <div id="acadResult" style="margin-top: 20px; padding: 15px; background: #eef4f9; border-left: 5px solid var(--rw-blue);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+        <h4>Academic Score: <span id="acTotalScore">0</span> / 100 (<span id="acTotalPercentage">0%</span>)</h4>
+      </div>
+      <p id="acTotalWeight" style="font-weight: bold; color: var(--dark-blue);"></p>
+    </div>
+  </div>
+
+  <!-- TAB: FINAL COMBINED RESULT -->
+  <div id="tab-final" class="tab-content">
+    <h3>🏆 Final Combined Module Result</h3>
+    <br>
+    <div style="padding: 20px; background: #fff; border: 2px solid var(--border-color); border-radius: 8px;">
+      <p style="font-size: 1.1rem; margin-bottom: 10px;">
+        <strong>Field Supervisor Score (50%):</strong> <span id="finalSuperScore">0.0</span> / 50.0
+      </p>
+      <p style="font-size: 1.1rem; margin-bottom: 15px;">
+        <strong>Academic Evaluator Score (50%):</strong> <span id="finalAcadScore">0.0</span> / 50.0
+      </p>
+      <hr style="margin-bottom: 15px;">
+      <h2 style="color: var(--dark-blue);">
+        OVERALL GRADE: <span id="grandTotalScore">0</span> / 100 (<span id="grandTotalPercentage">0%</span>)
+      </h2>
+      <p id="passFailStatus" style="font-size: 1.2rem; font-weight: bold; margin-top: 10px;"></p>
+    </div>
+  </div>
+
+  <!-- TAB: CERTIFICATE OF COMPLETION -->
+  <div id="tab-cert" class="tab-content">
+    <div style="text-align: right; margin-bottom: 15px;" class="no-print">
+      <button class="print-btn" onclick="printCertificate()">🎓 Download / Print Certificate</button>
+    </div>
+
+    <div class="certificate-container">
+      <div class="cert-border-inner">
+        <h2 style="color: var(--dark-blue); letter-spacing: 2px;">REPUBLIC OF RWANDA</h2>
+        <p style="font-weight: bold; color: var(--rw-green);">MINISTRY OF EDUCATION / TVET BOARD</p>
+        <div id="certSchoolLogoWrap" style="display:none;margin:8px auto 12px;text-align:center;">
+          <img id="certSchoolLogo" alt="School logo" style="max-width:130px;max-height:90px;object-fit:contain;">
+        </div>
+        
+        <h1 class="cert-title">Certificate of Completion</h1>
+        <p class="cert-subtitle">Industrial Attachment Program</p>
+
+        <p class="cert-body">
+          This is to officially certify that
+        </p>
+
+        <div class="cert-recipient" id="certStudentName">STUDENT NAME</div>
+
+        <p class="cert-body">
+          Registration Code: <strong id="certStudentCode">00000000002</strong><br>
+          From <strong id="certSchoolName">TRAINING INSTITUTION</strong><br>
+          has successfully completed the practical attachment requirement for<br>
+          <span style="font-size: 1.2rem; color: var(--dark-blue); font-weight: bold;" id="certAccomplishmentLevel">LEVEL OF ACCOMPLISHMENT</span><br>
+          in
+        </p>
+
+        <h3 style="color: var(--dark-blue); font-size: 1.4rem; margin: 10px 0;" id="certTrade">FIELD OF STUDY</h3>
+
+        <p class="cert-body">
+          Hosted at: <strong id="certHostInst">HOST INSTITUTION</strong><br>
+          Total Practical Hours Completed: <strong id="certTotalHours">0 hrs</strong><br>
+          Overall Performance Grade: <strong id="certFinalGrade">0%</strong>
+        </p>
+
+        <div id="certificateQrSection" style="margin:18px auto 0;text-align:center;max-width:250px;">
+          <div id="certificateQrCode" style="display:flex;justify-content:center;min-height:120px;align-items:center;"></div>
+          <p style="font-size:10px;margin-top:6px;color:#333;">Scan to view the student record snapshot (procedures, attendance and self-assessments).</p>
+        </div>
+
+        <div class="cert-signatures">
+          <div class="cert-sig-box">
+            <div class="cert-sig-line"></div>
+            <p><strong>Field Supervisor Signature</strong></p>
+            <p id="certSuperName">Industry Partner</p>
+          </div>
+          <div class="cert-sig-box">
+            <div class="cert-sig-line"></div>
+            <p><strong>School Assessor / Principal</strong></p>
+            <p id="certSchoolAssessor">Academic Authority</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OFFICIAL PRINT SIGNATURE & STAMP SECTION -->
+  <div class="print-signature-section">
+    <div class="sig-box">
+      <p><strong>Field Supervisor Signature & Stamp</strong></p>
+      <div class="sig-line"></div>
+      <p>Date: ____ / ____ / 20___</p>
+    </div>
+    <div class="sig-box">
+      <p><strong>School Assessor / Head of Dept Signature</strong></p>
+      <div class="sig-line"></div>
+      <p>Date: ____ / ____ / 20___</p>
+    </div>
+  </div>
+
+  <!-- FLOATING SCROLL TOP BUTTON -->
+  <button id="scrollTopBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Go to top">⬆️</button>
+
+  <!-- EDIT STUDENT IDENTIFICATION MODAL -->
+  <div id="editProfileModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>✏️ Edit Student Identification</h3>
+        <button class="close-modal" onclick="closeEditProfileModal()">&times;</button>
+      </div>
+
+      <form id="editProfileForm" onsubmit="saveProfileChanges(event)">
+        <div class="form-group">
+          <label for="editCode">Student ID Code (Fixed):</label>
+          <input type="text" id="editCode" readonly>
+        </div>
+
+        <div class="form-group">
+          <label for="editName">Full Name:</label>
+          <input type="text" id="editName" required>
+        </div>
+
+        <div class="form-group">
+          <label for="editSchool">Institution / School Name:</label>
+          <input type="text" id="editSchool" required>
+        </div>
+
+        <div class="form-group">
+          <label for="editTrade">Target Option / Trade:</label>
+          <select id="editTrade" required>
+            <optgroup label="🏥 Health & Medical Sciences (REB/Senior System)">
+              <option value="Associate Nursing">Associate Nursing</option>
+              <option value="Medical Laboratory Sciences">Medical Laboratory Sciences</option>
+              <option value="Dental Therapy & Oral Health">Dental Therapy & Oral Health</option>
+            </optgroup>
+
+            <optgroup label="💻 ICT & Digital Technologies">
+              <option value="Software Development">Software Development</option>
+              <option value="Computer Systems & Architecture">Computer Systems & Architecture</option>
+              <option value="Networking & Internet Technologies">Networking & Internet Technologies</option>
+              <option value="Multimedia Production">Multimedia Production</option>
+              <option value="Software Programming & Embedded Systems">Software Programming & Embedded Systems</option>
+            </optgroup>
+
+            <optgroup label="🏗️ Construction & Building Services">
+              <option value="Building Construction">Building Construction</option>
+              <option value="Civil Engineering & Public Works">Civil Engineering & Public Works</option>
+              <option value="Plumbing Technology">Plumbing Technology</option>
+              <option value="Land Surveying">Land Surveying</option>
+              <option value="Interior Design">Interior Design</option>
+            </optgroup>
+
+            <optgroup label="⚡ Energy & Electrical Engineering">
+              <option value="Electrical Technology">Electrical Technology</option>
+              <option value="Renewable Energy (Solar, Biomass, Hydro)">Renewable Energy (Solar, Biomass, Hydro)</option>
+              <option value="Electronics & Telecommunication">Electronics & Telecommunication</option>
+            </optgroup>
+
+            <optgroup label="🛠️ Manufacturing, Mechanical & Automotive">
+              <option value="Automobile Technology (Engine & Bodywork)">Automobile Technology (Engine & Bodywork)</option>
+              <option value="Heavy Machinery Maintenance">Heavy Machinery Maintenance</option>
+              <option value="Manufacturing Technology / Mechanical Production">Manufacturing Technology / Mechanical Production</option>
+              <option value="Welding & Fabrication">Welding & Fabrication</option>
+            </optgroup>
+
+            <optgroup label="🌿 Agriculture, Animal Resources & Food Processing">
+              <option value="General Agriculture & Crop Production">General Agriculture & Crop Production</option>
+              <option value="Animal Health & Veterinary Technology">Animal Health & Veterinary Technology</option>
+              <option value="Food Processing & Technology">Food Processing & Technology</option>
+              <option value="Forestry & Wood Technology">Forestry & Wood Technology</option>
+              <option value="Irrigation & Water Engineering">Irrigation & Water Engineering</option>
+            </optgroup>
+
+            <optgroup label="🏨 Hospitality, Tourism & Creative Arts">
+              <option value="Culinary Arts">Culinary Arts</option>
+              <option value="Food & Beverage Operations">Food & Beverage Operations</option>
+              <option value="Front Office & Housekeeping Operations">Front Office & Housekeeping Operations</option>
+              <option value="Tourism & Park Management">Tourism & Park Management</option>
+              <option value="Fashion Design & Tailoring Technology">Fashion Design & Tailoring Technology</option>
+              <option value="Graphic Arts & Media Production">Graphic Arts & Media Production</option>
+            </optgroup>
+
+            <optgroup label="🛠️ Vocational Training Centers (VTCs — Levels 1 & 2)">
+              <option value="Masonry & Bricklaying">Masonry & Bricklaying</option>
+              <option value="Domestic Electrical Installation">Domestic Electrical Installation</option>
+              <option value="Domestic Plumbing">Domestic Plumbing</option>
+              <option value="Motorcycle Repair & Maintenance">Motorcycle Repair & Maintenance</option>
+              <option value="Hairdressing & Beauty Therapy">Hairdressing & Beauty Therapy</option>
+              <option value="Tailoring & Garment Making">Tailoring & Garment Making</option>
+              <option value="Leather Crafts & Shoemaking">Leather Crafts & Shoemaking</option>
+              <option value="Carpentry & Joinery">Carpentry & Joinery</option>
+            </optgroup>
+
+            <optgroup label="🚀 Specialized Technical Academies">
+              <option value="RCA - Software Engineering">Rwanda Coding Academy - Software Engineering</option>
+              <option value="RCA - Embedded Systems">Rwanda Coding Academy - Embedded Systems</option>
+              <option value="RCA - Cybersecurity">Rwanda Coding Academy - Cybersecurity</option>
+              <option value="RSCA Nyundo - Music Performance">Rwanda School of Creative Arts (RSCA - Nyundo) - Music Performance</option>
+              <option value="RSCA Nyundo - Fine & Plastic Arts">Rwanda School of Creative Arts (RSCA - Nyundo) - Fine & Plastic Arts</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="editPhoto">Change Passport Photo:</label>
+          <input type="file" id="editPhoto" accept="image/*" onchange="previewEditPassportPhoto(event)">
+        </div>
+
+        <button type="submit" class="btn-submit" style="width: 100%;">Save Identification Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const tradesList = [
+      "Associate Nursing",
+      "Medical Laboratory Sciences",
+      "Dental Therapy & Oral Health",
+      "ICT & Digital Technologies",
+      "Software Development",
+      "Computer Systems & Architecture",
+      "Networking & Internet Technologies",
+      "Multimedia Production",
+      "Software Programming & Embedded Systems",
+      "Building Construction",
+      "Civil Engineering & Public Works",
+      "Plumbing Technology",
+      "Land Surveying",
+      "Interior Design",
+      "Electrical Technology",
+      "Renewable Energy (Solar, Biomass, Hydro)",
+      "Electronics & Telecommunication",
+      "Automobile Technology (Engine & Bodywork)",
+      "Heavy Machinery Maintenance",
+      "Manufacturing Technology / Mechanical Production",
+      "Welding & Fabrication",
+      "General Agriculture & Crop Production",
+      "Animal Health & Veterinary Technology",
+      "Food Processing & Technology",
+      "Forestry & Wood Technology",
+      "Irrigation & Water Engineering",
+      "Culinary Arts",
+      "Food & Beverage Operations",
+      "Front Office & Housekeeping Operations",
+      "Tourism & Park Management",
+      "Fashion Design & Tailoring Technology",
+      "Graphic Arts & Media Production",
+      "Masonry & Bricklaying",
+      "Domestic Electrical Installation",
+      "Domestic Plumbing",
+      "Motorcycle Repair & Maintenance",
+      "Hairdressing & Beauty Therapy",
+      "Tailoring & Garment Making",
+      "Leather Crafts & Shoemaking",
+      "Carpentry & Joinery",
+      "Software Engineering (RCA)",
+      "Embedded Systems (RCA)",
+      "Cybersecurity (RCA)",
+      "Music Performance (RSCA)",
+      "Fine & Plastic Arts (RSCA)",
+    ];
+
+    function isNursingOrHealthTrade(tradeName) {
+      const trade = tradeName ? tradeName.toLowerCase() : "";
+      return trade.includes("nursing") || trade.includes("medical") || trade.includes("dental") || trade.includes("health");
+    }
+
+    function getCompetencesForTrade(tradeName) {
+      if (isNursingOrHealthTrade(tradeName)) {
+        return [
+          // SENIOR 4 LOGBOOK PROCEDURES
+          { level: "S4", name: "1. Simple hand washing" },
+          { level: "S4", name: "2. Sterile and non-sterile gloving" },
+          { level: "S4", name: "3. Removing sterile gloves" },
+          { level: "S4", name: "4. Unoccupied bed, with changing bed-sheets: one nurse" },
+          { level: "S4", name: "5. Unoccupied bed, with changing bed-sheets: two nurses" },
+          { level: "S4", name: "6. Unoccupied bed making without changing bed sheets" },
+          { level: "S4", name: "7. Occupied bed, changing bed-sheets: Two nurses patient can turn" },
+          { level: "S4", name: "8. Occupied bed making, patient can sit" },
+          { level: "S4", name: "9. Occupied bed making, patient can't sit" },
+          { level: "S4", name: "10. Post-operative bed making" },
+          { level: "S4", name: "11. Complete bed bath patient cannot sit" },
+          { level: "S4", name: "12. Complete bed bath, patient can sit" },
+          { level: "S4", name: "13. Complete bed bath, patient cannot sit or turn" },
+          { level: "S4", name: "14. Partial bed bath, perineal care" },
+          { level: "S4", name: "15. Turning client to the lateral or prone position in bed" },
+          { level: "S4", name: "16. Moving patient in bed (two nurses using turn sheet)" },
+          { level: "S4", name: "17. Moving the patient from bed to chair or wheel Chair (one nurse and two nurses)" },
+          { level: "S4", name: "18. Moving the client from bed to stretcher" },
+          { level: "S4", name: "19. Application of dry and moist heat" },
+          { level: "S4", name: "20. Application of dry and moist cold" },
+          { level: "S4", name: "21. Use of urinal" },
+          { level: "S4", name: "22. Use of bed pan" },
+          { level: "S4", name: "23. Administering enema (evacuating enema/return flow enema)" },
+          { level: "S4", name: "24. Assisting clients in using diapers" },
+          { level: "S4", name: "25. Manual removal of fecaloma" },
+          { level: "S4", name: "26. Body temperature measurement" },
+          { level: "S4", name: "27. Pulse measurement" },
+          { level: "S4", name: "28. Blood pressure measurement" },
+          { level: "S4", name: "29. Pulse oximetry Measurement (oxygen saturation)" },
+          { level: "S4", name: "30. Height measurement" },
+          { level: "S4", name: "31. Weight measurement" },
+          { level: "S4", name: "32. Topical application" },
+          { level: "S4", name: "33. Eye medication administration" },
+          { level: "S4", name: "34. Ear drug administration" },
+          { level: "S4", name: "35. Nasal drug administration" },
+          { level: "S4", name: "36. Auscultation of fetal heart rate" },
+          { level: "S4", name: "37. Care Of The New-Born Baby" },
+
+          // SENIOR 5 LOGBOOK PROCEDURES
+          { level: "S5", name: "1. Aseptic dry wound dressing" },
+          { level: "S5", name: "2. Wet wound dressing" },
+          { level: "S5", name: "3. Spiral bandage" },
+          { level: "S5", name: "4. Spica bandage" },
+          { level: "S5", name: "5. Earlobe bandage" },
+          { level: "S5", name: "6. Cranial bandage" },
+          { level: "S5", name: "7. Monocular bandage (Right or Left)" },
+          { level: "S5", name: "8. Binocular bandage" },
+          { level: "S5", name: "9. Hand gloved bandage" },
+          { level: "S5", name: "10. Triangular bandage" },
+          { level: "S5", name: "11. Stump bandage" },
+          { level: "S5", name: "12. Rapid Test for Malaria" },
+          { level: "S5", name: "13. Performing urine test (albumin, glucose)" },
+          { level: "S5", name: "14. Performing glycaemia test" },
+          { level: "S5", name: "15. Putting the victim into the recovery position" },
+          { level: "S5", name: "16. First aid interventions in case of burns" },
+          { level: "S5", name: "17. First aid in case of drowning" },
+          { level: "S5", name: "18. Choking relief in a responsive adult or child" },
+          { level: "S5", name: "19. Choking relief in an unresponsive adult or child" },
+          { level: "S5", name: "20. Choking relief in a responsive adult or child" },
+          { level: "S5", name: "21. Choking relief in infants (Back slaps and chest thrusts)" },
+          { level: "S5", name: "22. Choking Relief in an Unresponsive Infant" },
+          { level: "S5", name: "23. Cardiorespiratory Resuscitation: CPR" },
+          { level: "S5", name: "24. First aid care for broken bones" },
+          { level: "S5", name: "25. First aid in case of Epileptic seizure" },
+          { level: "S5", name: "26. Immediate post-natal care of the Mother" },
+          { level: "S5", name: "27. Pre-HIV Testing Counselling For Pregnant Woman (PMTCT)" },
+          { level: "S5", name: "28. Withdrawing medication from a vial" },
+          { level: "S5", name: "29. Intramuscular injection (IM)" },
+          { level: "S5", name: "30. Subcutaneous injection" },
+          { level: "S5", name: "31. Venous puncture" },
+          { level: "S5", name: "32. Administration of IV drug (patient has an IV line)" },
+          { level: "S5", name: "33. IV infusion or intravenous perfusion" },
+          { level: "S5", name: "34. Hygiene care of ileostomy or colostomy" },
+
+          // SENIOR 6 LOGBOOK PROCEDURES
+          { level: "S6", name: "1. Nasogastric Tube (NGT) Feeding" },
+          { level: "S6", name: "2. Provision of modern Family Planning method (pills, injection)" },
+          { level: "S6", name: "3. Provision of natural Family Planning methods (cycle beads, calendar methods)" },
+          { level: "S6", name: "4. Provision of barrier Family Planning method (male and female condom)" },
+          { level: "S6", name: "5. Assessment of nutritional status of a child" },
+          { level: "S6", name: "6. Administration of vaccines according to Expanded program of Immunization" }
+        ];
+      }
+
+      // STANDARD TVET LEVELS L3, L4, L5
+      return [
+        { level: "L3", name: "1. Fundamental Systems Operation & Environment Setup" },
+        { level: "L3", name: "2. Basic Field Inspection & Safety Protocols" },
+        { level: "L4", name: "1. Intermediate Technical Operations & Workflow Control" },
+        { level: "L4", name: "2. Tool Calibration & Maintenance" },
+        { level: "L5", name: "1. Advanced Technical Project Execution" },
+        { level: "L5", name: "2. Diagnostic Troubleshooting & Reporting" }
+      ];
+    }
+
+    let currentUser = null;
+    let tradeCompetences = [];
+    let activeCompetences = [];
+
+    function getTodayString() {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedUser = localStorage.getItem('rw_current_user');
+      
+      if (!savedUser) {
+        currentUser = {
+          fullName: "Student Learner",
+          schoolName: "Training Institution / School Name",
+          trade: "Associate Nursing",
+          code: "00000000002",
+          practiceInst: "",
+          sd_tasks: [],
+          sd_attendance: [],
+          sd_company: {},
+          sd_eval: {},
+          sd_acad_eval: {},
+          sd_self_list: []
+        };
+      } else {
+        currentUser = JSON.parse(savedUser);
+      }
+
+      // Inbound Inter-file Data Synchronization
+      syncInboundData();
+
+      const userSelectedTrade = currentUser.trade || currentUser.option || currentUser.tradeSelected || "General TVET";
+
+      document.title = `${userSelectedTrade} Logbook Dashboard`;
+      document.getElementById('taskSectionHeader').innerText = `🛠️ Record ${userSelectedTrade} Daily/Weekly Activity`;
+
+      tradeCompetences = getCompetencesForTrade(userSelectedTrade);
+
+      // Render Student Identification Profile Details from Registered Data
+      renderProfileInfo();
+
+      if (currentUser.practiceInst || currentUser.sd_practice) {
+        document.getElementById('practiceInput').value = currentUser.practiceInst || currentUser.sd_practice;
+      }
+
+      const todayStr = getTodayString();
+      document.getElementById('taskDate').value = todayStr;
+
+      const attDateInput = document.getElementById('attDate');
+      attDateInput.value = todayStr;
+      attDateInput.setAttribute('max', todayStr);
+
+      populateLevelSelectOptions(userSelectedTrade);
+      populateTradeDropdown();
+      filterProceduresByLevel();
+      renderTasks();
+      renderAttendance();
+      loadCompanyInfo();
+      renderSelfAssessmentList();
+      loadEvaluationInfo();
+      loadAcademicInfo();
+      setupSearchDropdown();
+      setupSelfSearchDropdown();
+      updateQuickStats();
+      renderCertificate();
+    });
+
+    function renderProfileInfo() {
+      const name = currentUser.fullName || currentUser.name || currentUser.userName || 'Student Learner';
+      const school = currentUser.school || currentUser.schoolName || currentUser.userSchool || 'Training Institution';
+      const trade = currentUser.trade || currentUser.option || currentUser.userTrade || 'General Student';
+      const code = currentUser.code || currentUser.registrationCode || currentUser.userCode || '00000000002';
+      const practice = currentUser.practiceInst || currentUser.sd_practice || (currentUser.sd_company ? currentUser.sd_company.name : '') || 'Not Specified';
+      const photo = currentUser.photo || currentUser.photoData || currentUser.userPhoto || "https://via.placeholder.com/90";
+
+      document.getElementById('userName').innerText = name;
+      document.getElementById('userSchool').innerText = school;
+      document.getElementById('userTrade').innerText = trade;
+      document.getElementById('userCode').innerText = code;
+      document.getElementById('userPracticeInst').innerText = practice;
+      document.getElementById('userPhoto').src = photo;
+    }
+
+    // Inbound Data Fetching from Supervisor Evaluation and Additional Log Files
+    function syncInboundData() {
+      const studentCode = currentUser.code || currentUser.registrationCode || currentUser.studentCode || '';
+
+      // Refresh the current student's shared record so marks/comments entered in
+      // the Teacher or Supervisor portal are immediately available here.
+      const allUsers = JSON.parse(localStorage.getItem('rw_registered_users')) || [];
+      const registeredStudent = allUsers.find(u => (u.code || u.registrationCode || u.studentCode) === studentCode);
+      if (registeredStudent) {
+        currentUser.sd_tasks = registeredStudent.sd_tasks || registeredStudent.tasks || currentUser.sd_tasks || [];
+        currentUser.tasks = currentUser.sd_tasks;
+        currentUser.sd_self_list = registeredStudent.sd_self_list || registeredStudent.selfAssessments || currentUser.sd_self_list || [];
+        if (registeredStudent.supervisorEval) currentUser.sd_eval = registeredStudent.supervisorEval;
+        if (registeredStudent.academicEval) currentUser.sd_acad_eval = registeredStudent.academicEval;
+      }
+
+      // Fetch this student's supervisor evaluation first.
+      const studentSup = localStorage.getItem(`rw_supervisor_eval_data_${studentCode}`);
+      if (studentSup) {
+        try { currentUser.sd_eval = JSON.parse(studentSup); } catch(e) {}
+      } else {
+        const extEval = localStorage.getItem('rw_supervisor_eval_data');
+        if (extEval) {
+          try {
+            const parsed = JSON.parse(extEval);
+            if (!parsed.studentCode || parsed.studentCode === studentCode) currentUser.sd_eval = parsed;
+          } catch(e) {}
+        }
+      }
+
+      // Fetch this student's academic evaluation.
+      const studentAcad = localStorage.getItem(`rw_academic_eval_data_${studentCode}`);
+      if (studentAcad) {
+        try { currentUser.sd_acad_eval = JSON.parse(studentAcad); } catch(e) {}
+      } else {
+        const extAcad = localStorage.getItem('rw_academic_eval_data');
+        if (extAcad) {
+          try {
+            const parsed = JSON.parse(extAcad);
+            if (!parsed.studentCode || parsed.studentCode === studentCode) currentUser.sd_acad_eval = parsed;
+          } catch(e) {}
+        }
+      }
+
+      // Fetch this student's daily tasks.
+      const studentTasks = localStorage.getItem(`rw_additional_logs_${studentCode}`);
+      if (studentTasks) {
+        try {
+          currentUser.sd_tasks = JSON.parse(studentTasks);
+          currentUser.tasks = currentUser.sd_tasks;
+        } catch(e) {}
+      } else {
+        const extLogs = localStorage.getItem('rw_additional_logs');
+        if (extLogs) {
+          try {
+            const parsed = JSON.parse(extLogs);
+            if (!parsed.studentCode || parsed.studentCode === studentCode) {
+              currentUser.sd_tasks = parsed.tasks || parsed;
+              currentUser.tasks = currentUser.sd_tasks;
+            }
+          } catch(e) {}
+        }
+      }
+
+      // Fetch this student's self-assessment records.
+      const studentSelf = localStorage.getItem(`rw_self_assessment_data_${studentCode}`);
+      if (studentSelf) {
+        try { currentUser.sd_self_list = JSON.parse(studentSelf); } catch(e) {}
+      }
+    }
+
+    // Outbound Data Synchronization Handler across external files
+    function syncOutboundData() {
+      const studentCode = currentUser.code || currentUser.registrationCode || currentUser.studentCode || '';
+      if (currentUser.sd_tasks) {
+        localStorage.setItem('rw_additional_logs', JSON.stringify({ studentCode, tasks: currentUser.sd_tasks }));
+        if (studentCode) localStorage.setItem(`rw_additional_logs_${studentCode}`, JSON.stringify(currentUser.sd_tasks));
+      }
+      if (currentUser.sd_self_list) {
+        if (studentCode) localStorage.setItem(`rw_self_assessment_data_${studentCode}`, JSON.stringify(currentUser.sd_self_list));
+        localStorage.setItem('rw_self_assessment_data', JSON.stringify({ studentCode, selfAssessments: currentUser.sd_self_list }));
+      }
+      if (currentUser.sd_attendance) {
+        localStorage.setItem('rw_attendance_data', JSON.stringify(currentUser.sd_attendance));
+      }
+      if (currentUser.sd_company) {
+        localStorage.setItem('rw_company_info', JSON.stringify(currentUser.sd_company));
+      }
+      if (currentUser.sd_eval && studentCode) {
+        localStorage.setItem(`rw_supervisor_eval_data_${studentCode}`, JSON.stringify({ studentCode, ...currentUser.sd_eval }));
+      }
+      if (currentUser.sd_acad_eval && studentCode) {
+        localStorage.setItem(`rw_academic_eval_data_${studentCode}`, JSON.stringify({ studentCode, ...currentUser.sd_acad_eval }));
+      }
+    }
+
+    // DYNAMIC LEVEL/CLASS DROPDOWN SELECTION (S4-S6 vs L3-L5)
+    function populateLevelSelectOptions(tradeName) {
+      const selectElem = document.getElementById('studentLevel');
+      const labelElem = document.getElementById('studentLevelLabel');
+      if (!selectElem) return;
+
+      selectElem.innerHTML = '';
+
+      if (isNursingOrHealthTrade(tradeName)) {
+        if (labelElem) labelElem.innerText = "Academic Class (REB / Nursing):";
+        selectElem.innerHTML = `
+          <option value="S4">Senior 4 (S4)</option>
+          <option value="S5">Senior 5 (S5)</option>
+          <option value="S6">Senior 6 (S6)</option>
+        `;
+      } else {
+        if (labelElem) labelElem.innerText = "Qualification Level (TVET):";
+        selectElem.innerHTML = `
+          <option value="L3">Level 3 (L3)</option>
+          <option value="L4">Level 4 (L4)</option>
+          <option value="L5">Level 5 (L5)</option>
+        `;
+      }
+    }
+
+    window.addEventListener('scroll', () => {
+      const btn = document.getElementById('scrollTopBtn');
+      if (btn) btn.style.display = window.scrollY > 300 ? 'block' : 'none';
+    });
+
+    function populateTradeDropdown() {
+      const tradeSelect = document.getElementById('compTrade');
+      if (!tradeSelect) return;
+
+      tradeSelect.innerHTML = '<option value="">Select a Trade/Field</option>';
+      tradesList.forEach(trade => {
+        const option = document.createElement('option');
+        option.value = trade;
+        option.textContent = trade;
+        tradeSelect.appendChild(option);
+      });
+    }
+
+    function savePracticeInstitution() {
+      const val = document.getElementById('practiceInput').value.trim();
+      if (!val) {
+        alert("Please enter an institution for practice!");
+        return;
+      }
+      currentUser.practiceInst = val;
+      currentUser.sd_practice = val;
+      document.getElementById('userPracticeInst').innerText = val;
+      saveUserData();
+      alert("✅ Practice institution updated successfully!");
+    }
+
+    function switchTab(evt, tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      evt.currentTarget.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+      
+      // Auto-sync evaluations when viewing results or evaluation tabs
+      syncInboundData();
+      loadEvaluationInfo();
+      loadAcademicInfo();
+
+      if (tabId === 'tab-cert' || tabId === 'tab-final') {
+        renderCertificate();
+      }
+    }
+
+    function filterProceduresByLevel() {
+      const level = document.getElementById('studentLevel').value;
+      
+      if (level === "S4" || level === "L3") {
+        activeCompetences = tradeCompetences.filter(c => c.level === "S4" || c.level === "L3");
+      } else if (level === "S5" || level === "L4") {
+        activeCompetences = tradeCompetences.filter(c => c.level === "S4" || c.level === "S5" || c.level === "L3" || c.level === "L4");
+      } else if (level === "S6" || level === "L5") {
+        activeCompetences = tradeCompetences.filter(c => c.level === "S4" || c.level === "S5" || c.level === "S6" || c.level === "L3" || c.level === "L4" || c.level === "L5");
+      }
+      
+      document.getElementById('levelInfo').innerText = `(${level} Competences Loaded - ${activeCompetences.length} Available)`;
+      document.getElementById('procSearchInput').value = "";
+      document.getElementById('customProcGroup').style.display = 'none';
+      renderCertificate();
+    }
+
+    function updateQuickStats() {
+      const tasks = currentUser.sd_tasks || currentUser.tasks || [];
+      const totalHours = tasks.reduce((sum, t) => sum + (parseFloat(t.hours) || 0), 0);
+      const verified = tasks.filter(t => t.supervised).length;
+
+      document.getElementById('statTotalHours').innerText = `${totalHours} hrs`;
+      document.getElementById('statTotalEntries').innerText = tasks.length;
+      document.getElementById('statVerified').innerText = verified;
+    }
+
+    function setupSearchDropdown() {
+      const searchInput = document.getElementById('procSearchInput');
+      const dropdown = document.getElementById('procDropdownList');
+      const customGroup = document.getElementById('customProcGroup');
+
+      searchInput.addEventListener('focus', showDropdown);
+      searchInput.addEventListener('input', showDropdown);
+
+      function showDropdown() {
+        const query = searchInput.value.toLowerCase();
+        dropdown.innerHTML = '';
+
+        const filtered = activeCompetences.filter(c => c.name.toLowerCase().includes(query));
+
+        filtered.forEach(item => {
+          const li = document.createElement('li');
+          li.textContent = `[${item.level}] ${item.name}`;
+          li.onclick = () => {
+            searchInput.value = item.name;
+            dropdown.style.display = 'none';
+            customGroup.style.display = 'none';
+          };
+          dropdown.appendChild(li);
+        });
+
+        const customLi = document.createElement('li');
+        customLi.innerHTML = `<em>+ Other / Custom Task...</em>`;
+        customLi.style.fontWeight = 'bold';
+        customLi.style.color = 'var(--rw-blue)';
+        customLi.onclick = () => {
+          searchInput.value = "Custom Task";
+          dropdown.style.display = 'none';
+          customGroup.style.display = 'block';
+        };
+        dropdown.appendChild(customLi);
+
+        dropdown.style.display = 'block';
+      }
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.search-proc-wrapper')) {
+          dropdown.style.display = 'none';
+        }
+      });
+    }
+
+    function setupSelfSearchDropdown() {
+      const searchInput = document.getElementById('selfProcSearchInput');
+      const dropdown = document.getElementById('selfProcDropdownList');
+      const customGroup = document.getElementById('selfCustomProcGroup');
+
+      if (!searchInput) return;
+
+      searchInput.addEventListener('focus', showDropdown);
+      searchInput.addEventListener('input', showDropdown);
+
+      function showDropdown() {
+        const query = searchInput.value.toLowerCase();
+        dropdown.innerHTML = '';
+
+        const filtered = activeCompetences.filter(c => c.name.toLowerCase().includes(query));
+
+        filtered.forEach(item => {
+          const li = document.createElement('li');
+          li.textContent = `[${item.level}] ${item.name}`;
+          li.onclick = () => {
+            searchInput.value = item.name;
+            dropdown.style.display = 'none';
+            customGroup.style.display = 'none';
+          };
+          dropdown.appendChild(li);
+        });
+
+        const customLi = document.createElement('li');
+        customLi.innerHTML = `<em>+ Other / Custom Task...</em>`;
+        customLi.style.fontWeight = 'bold';
+        customLi.style.color = 'var(--rw-blue)';
+        customLi.onclick = () => {
+          searchInput.value = "Custom Task";
+          dropdown.style.display = 'none';
+          customGroup.style.display = 'block';
+        };
+        dropdown.appendChild(customLi);
+
+        dropdown.style.display = 'block';
+      }
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#tab-self .search-proc-wrapper')) {
+          dropdown.style.display = 'none';
+        }
+      });
+    }
+
+    function toggleSupervisionFields() {
+      const checked = document.getElementById('taskSupervised').checked;
+      const detailsGroup = document.getElementById('supervisionDetailsGroup');
+      detailsGroup.style.display = checked ? 'block' : 'none';
+
+      if (checked && currentUser.sd_company) {
+        if (!document.getElementById('taskSuperName').value) {
+          document.getElementById('taskSuperName').value = currentUser.sd_company.superName || '';
+        }
+        if (!document.getElementById('taskSuperPhone').value) {
+          document.getElementById('taskSuperPhone').value = currentUser.sd_company.superPhone || '';
+        }
+        if (!document.getElementById('taskSuperEmail').value) {
+          document.getElementById('taskSuperEmail').value = currentUser.sd_company.email || '';
+        }
+      }
+    }
+
+    document.getElementById('taskEntryForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      let competenceName = document.getElementById('procSearchInput').value.trim();
+      if (competenceName === "Custom Task") {
+        competenceName = document.getElementById('customProcInput').value.trim() || "Custom Activity";
+      }
+
+      const isSupervised = document.getElementById('taskSupervised').checked;
+      const editingId = document.getElementById('editingTaskId').value;
+
+      const taskData = {
+        id: editingId ? parseInt(editingId) : Date.now(),
+        week: document.getElementById('taskWeek').value,
+        date: document.getElementById('taskDate').value,
+        hours: document.getElementById('taskHours').value,
+        competence: competenceName,
+        procedure: competenceName,
+        description: document.getElementById('taskDescription').value.trim(),
+        tools: document.getElementById('taskTools').value.trim(),
+        supervised: isSupervised,
+        supervisor: isSupervised ? {
+          name: document.getElementById('taskSuperName').value.trim() || 'RN Supervisor',
+          phone: document.getElementById('taskSuperPhone').value.trim(),
+          email: document.getElementById('taskSuperEmail').value.trim(),
+          signature: document.getElementById('taskSuperSign').value.trim() || 'Signed (Verified)',
+          comment: document.getElementById('taskSuperComment').value.trim()
+        } : null
+      };
+
+      if (!currentUser.sd_tasks) currentUser.sd_tasks = currentUser.tasks || [];
+
+      if (editingId) {
+        const index = currentUser.sd_tasks.findIndex(t => t.id === parseInt(editingId));
+        if (index !== -1) {
+          currentUser.sd_tasks[index] = taskData;
+        }
+        alert("✅ Log entry updated successfully!");
+      } else {
+        currentUser.sd_tasks.push(taskData);
+        alert("✅ Log entry recorded successfully!");
+      }
+
+      currentUser.tasks = currentUser.sd_tasks;
+      saveUserData();
+
+      renderTasks();
+      updateQuickStats();
+      resetTaskForm();
+    });
+
+    function editTask(id) {
+      const tasksList = currentUser.sd_tasks || currentUser.tasks || [];
+      const task = tasksList.find(t => t.id === id);
+      if (!task) return;
+
+      document.getElementById('editingTaskId').value = task.id;
+      document.getElementById('taskWeek').value = task.week;
+      document.getElementById('taskDate').value = task.date;
+      document.getElementById('taskHours').value = task.hours;
+      document.getElementById('procSearchInput').value = task.competence;
+      document.getElementById('taskDescription').value = task.description;
+      document.getElementById('taskTools').value = task.tools;
+
+      document.getElementById('taskSupervised').checked = task.supervised;
+      toggleSupervisionFields();
+
+      if (task.supervised && task.supervisor) {
+        document.getElementById('taskSuperName').value = task.supervisor.name || '';
+        document.getElementById('taskSuperPhone').value = task.supervisor.phone || '';
+        document.getElementById('taskSuperEmail').value = task.supervisor.email || '';
+        document.getElementById('taskSuperSign').value = task.supervisor.signature || '';
+        document.getElementById('taskSuperComment').value = task.supervisor.comment || '';
+      }
+
+      document.getElementById('taskSubmitBtn').innerText = "Update Log Entry";
+      document.getElementById('taskCancelBtn').style.display = "inline-block";
+
+      window.scrollTo({ top: document.getElementById('tab-tasks').offsetTop - 20, behavior: 'smooth' });
+    }
+
+    function resetTaskForm() {
+      document.getElementById('editingTaskId').value = "";
+      document.getElementById('taskEntryForm').reset();
+      document.getElementById('taskDate').value = getTodayString();
+      document.getElementById('customProcGroup').style.display = 'none';
+      document.getElementById('supervisionDetailsGroup').style.display = 'none';
+      document.getElementById('taskSubmitBtn').innerText = "Add Log Entry";
+      document.getElementById('taskCancelBtn').style.display = "none";
+    }
+
+    function renderTasks() {
+      const tbody = document.getElementById('tasksTableBody');
+      tbody.innerHTML = '';
+
+      let tasksList = currentUser.sd_tasks || currentUser.tasks || [];
+
+      const searchText = document.getElementById('taskSearchFilter').value.toLowerCase();
+      const weekFilter = document.getElementById('taskWeekFilter').value;
+
+      if (searchText) {
+        tasksList = tasksList.filter(t => 
+          t.competence.toLowerCase().includes(searchText) || 
+          t.description.toLowerCase().includes(searchText) || 
+          t.tools.toLowerCase().includes(searchText)
+        );
+      }
+
+      if (weekFilter) {
+        tasksList = tasksList.filter(t => t.week.toString() === weekFilter);
+      }
+
+      if (tasksList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #777;">No tasks found matching criteria.</td></tr>`;
+        return;
+      }
+
+      tasksList.forEach((task, index) => {
+        let supervisorInfo = `<span style="color: #888;">Self-Directed</span>`;
+        let statusBadge = `<span class="status-badge badge-pending">Self Logged</span>`;
+        
+        if (task.supervised && task.supervisor) {
+          statusBadge = `<span class="status-badge badge-verified">Verified</span>`;
+          supervisorInfo = `
+            <div style="font-size: 0.85rem;">
+              <strong style="color: var(--dark-blue);">${task.supervisor.name}</strong><br>
+              ${task.supervisor.phone ? `📞 ${task.supervisor.phone}<br>` : ''}
+              ${task.supervisor.email ? `✉️ ${task.supervisor.email}<br>` : ''}
+              <span style="color: var(--rw-green); font-weight: bold;">✍️ ${task.supervisor.signature}</span>
+              ${task.supervisor.comment ? `<p style="font-style: italic; color: #555; margin-top: 3px;">"${task.supervisor.comment}"</p>` : ''}
+            </div>
+          `;
+        }
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>#${index + 1}</strong></td>
+          <td><strong>Week ${task.week}</strong></td>
+          <td>${task.date}</td>
+          <td><strong>${task.competence}</strong></td>
+          <td>${task.description}</td>
+          <td>${task.tools}</td>
+          <td>${supervisorInfo}</td>
+          <td>${statusBadge}</td>
+          <td>${task.hours} hrs</td>
+          <td style="white-space: nowrap;">
+            <button class="btn-edit" onclick="editTask(${task.id})">Edit</button>
+            <button class="btn-delete" onclick="deleteTask(${task.id})">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function deleteTask(id) {
+      if (confirm("Are you sure you want to delete this log entry?")) {
+        const tasksList = currentUser.sd_tasks || currentUser.tasks || [];
+        const updated = tasksList.filter(t => t.id !== id);
+        currentUser.sd_tasks = updated;
+        currentUser.tasks = updated;
+        saveUserData();
+        renderTasks();
+        updateQuickStats();
+      }
+    }
+
+    document.getElementById('attendanceForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const selectedDate = document.getElementById('attDate').value;
+      const todayStr = getTodayString();
+
+      if (selectedDate > todayStr) {
+        alert("⚠️ Error: You cannot record attendance for a future date!");
+        return;
+      }
+
+      const editingId = document.getElementById('editingAttId').value;
+
+      const attData = {
+        id: editingId ? parseInt(editingId) : Date.now(),
+        date: selectedDate,
+        timeIn: document.getElementById('attTimeIn').value,
+        timeOut: document.getElementById('attTimeOut').value,
+        status: document.getElementById('attStatus').value
+      };
+
+      if (!currentUser.sd_attendance) currentUser.sd_attendance = currentUser.attendance || [];
+
+      if (editingId) {
+        const index = currentUser.sd_attendance.findIndex(a => a.id === parseInt(editingId));
+        if (index !== -1) currentUser.sd_attendance[index] = attData;
+        alert("✅ Attendance entry updated!");
+      } else {
+        currentUser.sd_attendance.push(attData);
+        alert("✅ Attendance logged!");
+      }
+
+      currentUser.attendance = currentUser.sd_attendance;
+      saveUserData();
+
+      renderAttendance();
+      resetAttendanceForm();
+    });
+
+    function editAttendance(id) {
+      const attList = currentUser.sd_attendance || currentUser.attendance || [];
+      const att = attList.find(a => a.id === id);
+      if (!att) return;
+
+      document.getElementById('editingAttId').value = att.id;
+      document.getElementById('attDate').value = att.date;
+      document.getElementById('attTimeIn').value = att.timeIn;
+      document.getElementById('attTimeOut').value = att.timeOut;
+      document.getElementById('attStatus').value = att.status;
+
+      document.getElementById('attSubmitBtn').innerText = "Update Attendance";
+      document.getElementById('attCancelBtn').style.display = "inline-block";
+    }
+
+    function resetAttendanceForm() {
+      document.getElementById('editingAttId').value = "";
+      document.getElementById('attendanceForm').reset();
+      
+      const todayStr = getTodayString();
+      const attDateInput = document.getElementById('attDate');
+      attDateInput.value = todayStr;
+      attDateInput.setAttribute('max', todayStr);
+
+      document.getElementById('attSubmitBtn').innerText = "Log Attendance";
+      document.getElementById('attCancelBtn').style.display = "none";
+    }
+
+    function renderAttendance() {
+      const tbody = document.getElementById('attendanceTableBody');
+      tbody.innerHTML = '';
+
+      const attList = currentUser.sd_attendance || currentUser.attendance || [];
+
+      if (attList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #777;">No attendance recorded yet.</td></tr>`;
+        return;
+      }
+
+      attList.forEach(att => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${att.date}</td>
+          <td>${att.timeIn}</td>
+          <td>${att.timeOut}</td>
+          <td><strong>${att.status}</strong></td>
+          <td style="white-space: nowrap;">
+            <button class="btn-edit" onclick="editAttendance(${att.id})">Edit</button>
+            <button class="btn-delete" onclick="deleteAttendance(${att.id})">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function deleteAttendance(id) {
+      if (confirm("Remove this attendance record?")) {
+        const attList = currentUser.sd_attendance || currentUser.attendance || [];
+        const updated = attList.filter(a => a.id !== id);
+        currentUser.sd_attendance = updated;
+        currentUser.attendance = updated;
+        saveUserData();
+        renderAttendance();
+      }
+    }
+
+    function saveCompanyDetails() {
+      currentUser.sd_company = {
+        name: document.getElementById('compName').value.trim(),
+        phone: document.getElementById('compPhone').value.trim(),
+        email: document.getElementById('compEmail').value.trim(),
+        district: document.getElementById('compDistrict').value.trim(),
+        sector: document.getElementById('compSector').value.trim(),
+        trade: document.getElementById('compTrade').value,
+        superName: document.getElementById('superName').value.trim(),
+        superPhone: document.getElementById('superPhone').value.trim()
+      };
+      
+      if (currentUser.sd_company.name) {
+        currentUser.practiceInst = currentUser.sd_company.name;
+        currentUser.sd_practice = currentUser.sd_company.name;
+        document.getElementById('userPracticeInst').innerText = currentUser.sd_company.name;
+        document.getElementById('practiceInput').value = currentUser.sd_company.name;
+      }
+
+      saveUserData();
+      renderCompanyDisplay();
+      loadEvaluationInfo();
+      renderCertificate();
+      alert('✅ Organization information saved!');
+    }
+
+    function editCompanyDetails() {
+      window.scrollTo({ top: document.getElementById('tab-company').offsetTop - 20, behavior: 'smooth' });
+      document.getElementById('compName').focus();
+    }
+
+    function loadCompanyInfo() {
+      if (currentUser.sd_company) {
+        const c = currentUser.sd_company;
+        document.getElementById('compName').value = c.name || '';
+        document.getElementById('compPhone').value = c.phone || '';
+        document.getElementById('compEmail').value = c.email || '';
+        document.getElementById('compDistrict').value = c.district || '';
+        document.getElementById('compSector').value = c.sector || '';
+        document.getElementById('compTrade').value = c.trade || '';
+        document.getElementById('superName').value = c.superName || '';
+        document.getElementById('superPhone').value = c.superPhone || '';
+        renderCompanyDisplay();
+      }
+    }
+
+    function renderCompanyDisplay() {
+      const c = currentUser.sd_company;
+      const displayCard = document.getElementById('companyDisplayCard');
+      
+      if (c && (c.name || c.superName || c.phone || c.email)) {
+        document.getElementById('dispCompName').innerText = c.name || 'N/A';
+        document.getElementById('dispCompPhone').innerText = c.phone || 'N/A';
+        document.getElementById('dispCompEmail').innerText = c.email || 'N/A';
+        document.getElementById('dispCompDistrict').innerText = c.district || 'N/A';
+        document.getElementById('dispCompSector').innerText = c.sector || 'N/A';
+        document.getElementById('dispCompTrade').innerText = c.trade || 'N/A';
+        document.getElementById('dispSuperName').innerText = c.superName || 'N/A';
+        document.getElementById('dispSuperPhone').innerText = c.superPhone || 'N/A';
+        displayCard.style.display = 'block';
+      } else {
+        displayCard.style.display = 'none';
+      }
+    }
+
+    function loadEvaluationInfo() {
+      const c = currentUser.sd_company || {};
+      const ev = currentUser.sd_eval || {};
+      const sup = ev.supervisorInfo || {};
+
+      document.getElementById('evalSuperName').innerText = ev.supervisorName || sup.name || c.superName || 'Not Specified';
+      document.getElementById('evalSuperPhone').innerText = ev.supervisorPhone || sup.phone || c.superPhone || 'Not Specified';
+      document.getElementById('evalSuperEmail').innerText = ev.supervisorEmail || sup.email || c.email || 'Not Specified';
+      document.getElementById('evalSuperInst').innerText = sup.institution || c.name || currentUser.practiceInst || 'Not Specified';
+      
+      const loc = [c.district, c.sector].filter(Boolean).join(' / ');
+      document.getElementById('evalSuperLoc').innerText = loc || 'Not Specified';
+      document.getElementById('evalSuperCode').innerText = sup.signature || sup.code || 'Verified';
+
+      if (currentUser.sd_eval) {
+        const r = ev.r ?? ev.techRoutines;
+        const t = ev.t ?? ev.techTools;
+        const ind = ev.ind ?? ev.attIndividual;
+        const inter = ev.inter ?? ev.attInteractive;
+        const org = ev.org ?? ev.attOrg;
+        const rules = ev.rules ?? ev.attRules;
+        const q = ev.q ?? ev.quality;
+
+        if (r !== undefined) document.getElementById('evTechRoutines').value = r;
+        if (t !== undefined) document.getElementById('evTechTools').value = t;
+        if (ind !== undefined) document.getElementById('evAttIndividual').value = ind;
+        if (inter !== undefined) document.getElementById('evAttInteractive').value = inter;
+        if (org !== undefined) document.getElementById('evAttOrg').value = org;
+        if (rules !== undefined) document.getElementById('evAttRules').value = rules;
+        if (q !== undefined) document.getElementById('evQuality').value = q;
+
+        const tot = parseFloat(ev.total ?? ev.totalRaw ?? 0) || 0;
+        const pct = parseFloat(ev.percentage ?? tot) || tot;
+        const w50 = parseFloat(ev.weighted50 ?? ev.weightedScore ?? (tot * 0.5)) || 0;
+
+        document.getElementById('totalScore').innerText = tot;
+        document.getElementById('totalPercentage').innerText = `${pct}%`;
+        document.getElementById('totalWeight').innerText = `Contributes ${w50.toFixed(1)}% out of 50.0% toward the overall module result.`;
+        document.getElementById('evComments').value = ev.comments || ev.remarks || '';
+      }
+      updateFinalCombinedResult();
+    }
+
+    function loadAcademicInfo() {
+      const ac = currentUser.sd_acad_eval || {};
+      const teacher = ac.teacherInfo || currentUser.teacherAssessor || {};
+
+      document.getElementById('acadTeacherName').innerText = ac.teacherName || teacher.fullName || teacher.name || 'Assessor Recorded';
+      document.getElementById('acadTeacherSchool').innerText = teacher.school || currentUser.school || currentUser.schoolName || 'School Department';
+      document.getElementById('acadTeacherPhone').innerText = ac.teacherPhone || teacher.phone || teacher.contact || 'Registered';
+      document.getElementById('acadTeacherEmail').innerText = teacher.email || ac.teacherEmail || 'Registered';
+      document.getElementById('acadTeacherCode').innerText = ac.camisCode || teacher.regCode || teacher.code || 'TR-EVAL-RECORDED';
+      document.getElementById('acadEvalDate').innerText = ac.evalDate || teacher.date || 'Recorded';
+
+      if (currentUser.sd_acad_eval) {
+        if (ac.logbook !== undefined) document.getElementById('acLogbook').value = ac.logbook;
+        if (ac.attendance !== undefined) document.getElementById('acAttendance').value = ac.attendance;
+        if (ac.selfReport !== undefined) document.getElementById('acSelfReport').value = ac.selfReport;
+        if (ac.visiting !== undefined) document.getElementById('acVisiting').value = ac.visiting;
+        if (ac.report !== undefined) document.getElementById('acReport').value = ac.report;
+        if (ac.defense !== undefined) document.getElementById('acDefense').value = ac.defense;
+        if (ac.mastery !== undefined) document.getElementById('acMastery').value = ac.mastery;
+
+        const tot = parseFloat(ac.total ?? ac.totalRaw ?? 0) || 0;
+        const pct = parseFloat(ac.percentage ?? tot) || tot;
+        const w50 = parseFloat(ac.weighted50 ?? ac.weightedScore ?? (tot * 0.5)) || 0;
+
+        document.getElementById('acTotalScore').innerText = tot;
+        document.getElementById('acTotalPercentage').innerText = `${pct}%`;
+        document.getElementById('acTotalWeight').innerText = `Contributes ${w50.toFixed(1)}% out of 50.0% toward the overall module result.`;
+        document.getElementById('acComments').value = ac.comments || '';
+      }
+      updateFinalCombinedResult();
+    }
+
+    function updateFinalCombinedResult() {
+      const superWeighted = currentUser.sd_eval ? parseFloat(currentUser.sd_eval.weighted50 ?? currentUser.sd_eval.weightedScore ?? 0) || 0 : 0;
+      const acadWeighted = currentUser.sd_acad_eval ? parseFloat(currentUser.sd_acad_eval.weighted50 ?? currentUser.sd_acad_eval.weightedScore ?? 0) || 0 : 0;
+
+      const grandTotal = (superWeighted + acadWeighted).toFixed(1);
+
+      document.getElementById('finalSuperScore').innerText = superWeighted.toFixed(1);
+      document.getElementById('finalAcadScore').innerText = acadWeighted.toFixed(1);
+      document.getElementById('grandTotalScore').innerText = grandTotal;
+      document.getElementById('grandTotalPercentage').innerText = `${grandTotal}%`;
+
+      const statusEl = document.getElementById('passFailStatus');
+      if (grandTotal >= 70) {
+        statusEl.innerText = "Status: PASSED (Competent) ✅";
+        statusEl.style.color = "var(--rw-green)";
+      } else if (grandTotal > 0) {
+        statusEl.innerText = "Status: NOT YET COMPETENT ❌";
+        statusEl.style.color = "var(--danger)";
+      } else {
+        statusEl.innerText = "Status: Pending Complete Evaluation";
+        statusEl.style.color = "#555";
+      }
+
+      currentUser.finalResult = {
+        supervisorContribution: superWeighted,
+        academicContribution: acadWeighted,
+        finalScore: parseFloat(grandTotal),
+        percentage: parseFloat(grandTotal),
+        supervisorComment: currentUser.sd_eval?.remarks || currentUser.sd_eval?.comments || '',
+        teacherComment: currentUser.sd_acad_eval?.comments || '',
+        supervisorInfo: currentUser.sd_eval?.supervisorInfo || {},
+        teacherInfo: currentUser.sd_acad_eval?.teacherInfo || {},
+        updatedAt: new Date().toISOString()
+      };
+
+      const studentCode = currentUser.code || currentUser.registrationCode || currentUser.studentCode || '';
+      if (studentCode) {
+        localStorage.setItem(`rw_final_result_${studentCode}`, JSON.stringify(currentUser.finalResult));
+      }
+
+      renderCertificate();
+    }
+
+    // UPDATED CERTIFICATE LEVEL DISPLAY
+    function renderCertificate() {
+      const tasks = currentUser.sd_tasks || currentUser.tasks || [];
+      const totalHours = tasks.reduce((sum, t) => sum + (parseFloat(t.hours) || 0), 0);
+
+      const superWeighted = currentUser.sd_eval ? parseFloat(currentUser.sd_eval.weighted50) || 0 : 0;
+      const acadWeighted = currentUser.sd_acad_eval ? parseFloat(currentUser.sd_acad_eval.weighted50) || 0 : 0;
+      const grandTotal = (superWeighted + acadWeighted).toFixed(1);
+
+      const c = currentUser.sd_company || {};
+      const ev = currentUser.sd_eval || {};
+      const ac = currentUser.sd_acad_eval || {};
+
+      const currentSelectedLevel = document.getElementById('studentLevel')?.value || "S4";
+      let levelText = "";
+
+      if (currentSelectedLevel.startsWith("S")) {
+        levelText = `SENIOR CLASS LEVEL: ${currentSelectedLevel.toUpperCase()}`;
+      } else {
+        levelText = `QUALIFICATION LEVEL: ${currentSelectedLevel.toUpperCase()}`;
+      }
+
+      document.getElementById('certStudentName').innerText = (currentUser.fullName || currentUser.name || 'STUDENT LEARNER').toUpperCase();
+      document.getElementById('certStudentCode').innerText = currentUser.code || '00000000002';
+      document.getElementById('certSchoolName').innerText = currentUser.school || currentUser.schoolName || 'TRAINING INSTITUTION';
+      document.getElementById('certAccomplishmentLevel').innerText = levelText;
+      document.getElementById('certTrade').innerText = (currentUser.trade || currentUser.option || 'FIELD OF STUDY').toUpperCase();
+      document.getElementById('certHostInst').innerText = c.name || currentUser.practiceInst || currentUser.sd_practice || 'HOST INSTITUTION';
+      document.getElementById('certTotalHours').innerText = `${totalHours} hrs`;
+      document.getElementById('certFinalGrade').innerText = `${grandTotal}%`;
+
+      document.getElementById('certSuperName').innerText = ev.supervisorInfo?.name || c.superName || 'Field Supervisor';
+      document.getElementById('certSchoolAssessor').innerText = ac.teacherInfo?.fullName || currentUser.teacherAssessor?.fullName || 'School Assessor';
+
+      const logoWrap = document.getElementById('certSchoolLogoWrap');
+      const logoImg = document.getElementById('certSchoolLogo');
+      const schoolLogo = ac.schoolLogo || currentUser.academicEval?.schoolLogo || '';
+      if (schoolLogo) { logoImg.src = schoolLogo; logoWrap.style.display = 'block'; }
+      else { logoImg.removeAttribute('src'); logoWrap.style.display = 'none'; }
+      renderCertificateQR();
+    }
+
+    // QR stores a compact, student-specific record snapshot. It does not depend on another device's localStorage.
+    // Very large records are compacted to keep the QR readable; hosting is needed for a live, unlimited record page.
+    function renderCertificateQR() {
+      const qrBox = document.getElementById('certificateQrCode');
+      if (!qrBox) return;
+      qrBox.innerHTML = '';
+      const code = currentUser.code || currentUser.registrationCode || currentUser.studentCode || '';
+      const tasks = (currentUser.sd_tasks && currentUser.sd_tasks.length) ? currentUser.sd_tasks : (currentUser.tasks || []);
+      const attendance = (currentUser.sd_attendance && currentUser.sd_attendance.length) ? currentUser.sd_attendance : (currentUser.attendanceLogs || currentUser.attendance || []);
+      const selfList = (currentUser.sd_self_list && currentUser.sd_self_list.length) ? currentUser.sd_self_list : (currentUser.selfAssessments || []);
+      const compact = {
+        type: 'RW-PRACTICAL-LOGBOOK-RECORD', student: {code, name: currentUser.fullName || currentUser.name || '', school: currentUser.school || currentUser.schoolName || '', trade: currentUser.trade || currentUser.option || ''},
+        procedures: tasks.map(t => ({date:t.date || t.taskDate || '', name:t.procedure || t.task || t.activity || t.competence || '', details:t.description || t.procedureDone || t.details || '', hours:t.hours || ''})),
+        attendance: attendance.map(a => ({date:a.date || a.attDate || '', status:a.status || a.attendance || '', timeIn:a.timeIn || '', timeOut:a.timeOut || '', hours:a.hours || ''})),
+        selfAssessment: selfList.map(a => ({procedure:a.procedure || '', expectations:a.expectations || '', gain:a.gain || '', challenges:a.challenges || '', reflection:a.reflection || ''}))
+      };
+      let payload = JSON.stringify(compact);
+      if (payload.length > 2700) {
+        // Preserve the newest/most recent entries if a QR payload approaches the practical QR capacity.
+        compact.procedures = compact.procedures.slice(-12);
+        compact.attendance = compact.attendance.slice(-20);
+        compact.selfAssessment = compact.selfAssessment.slice(-12);
+        payload = JSON.stringify(compact);
+      }
+      if (payload.length > 2900) {
+        compact.procedures = compact.procedures.map(t => ({date:t.date,name:t.name,hours:t.hours}));
+        compact.selfAssessment = compact.selfAssessment.map(a => ({procedure:a.procedure,gain:a.gain}));
+        payload = JSON.stringify(compact);
+      }
+      if (typeof QRCode === 'undefined') {
+        qrBox.textContent = 'QR generator requires an internet connection to load.';
+        return;
+      }
+      try { new QRCode(qrBox, {text: payload, width: 150, height: 150, correctLevel: QRCode.CorrectLevel.L}); }
+      catch (err) { qrBox.textContent = 'Record is too large for a QR snapshot. A hosted record page is needed for a full record.'; }
+    }
+
+    function printCertificate() {
+      const certTab = document.getElementById('tab-cert');
+      if (certTab) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        certTab.classList.add('active');
+      }
+      
+      window.print();
+    }
+
+    document.getElementById('selfAssessmentForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      let procName = document.getElementById('selfProcSearchInput').value.trim();
+      if (procName === "Custom Task") {
+        procName = document.getElementById('selfCustomProcInput').value.trim() || "Custom Procedure";
+      }
+
+      const editingId = document.getElementById('editingSelfId').value;
+
+      const selfData = {
+        id: editingId ? parseInt(editingId) : Date.now(),
+        procedure: procName,
+        expectations: document.getElementById('selfExpectations').value,
+        gain: document.getElementById('selfGain').value.trim(),
+        challenges: document.getElementById('selfChallenges').value.trim()
+      };
+
+      if (!currentUser.sd_self_list) currentUser.sd_self_list = [];
+
+      if (editingId) {
+        const index = currentUser.sd_self_list.findIndex(s => s.id === parseInt(editingId));
+        if (index !== -1) currentUser.sd_self_list[index] = selfData;
+        alert('✅ Self-assessment updated successfully!');
+      } else {
+        currentUser.sd_self_list.push(selfData);
+        alert('✅ Self-assessment saved for procedure!');
+      }
+
+      saveUserData();
+
+      renderSelfAssessmentList();
+      resetSelfForm();
+    });
+
+    function editSelfAssessment(id) {
+      const selfList = currentUser.sd_self_list || [];
+      const item = selfList.find(s => s.id === id);
+      if (!item) return;
+
+      document.getElementById('editingSelfId').value = item.id;
+      document.getElementById('selfProcSearchInput').value = item.procedure;
+      document.getElementById('selfExpectations').value = item.expectations;
+      document.getElementById('selfGain').value = item.gain;
+      document.getElementById('selfChallenges').value = item.challenges;
+
+      document.getElementById('selfSubmitBtn').innerText = "Update Self Assessment";
+      document.getElementById('selfCancelBtn').style.display = "inline-block";
+
+      window.scrollTo({ top: document.getElementById('tab-self').offsetTop - 20, behavior: 'smooth' });
+    }
+
+    function resetSelfForm() {
+      document.getElementById('editingSelfId').value = "";
+      document.getElementById('selfAssessmentForm').reset();
+      document.getElementById('selfCustomProcGroup').style.display = 'none';
+      document.getElementById('selfSubmitBtn').innerText = "Save Self Assessment";
+      document.getElementById('selfCancelBtn').style.display = "none";
+    }
+
+    function renderSelfAssessmentList() {
+      const tbody = document.getElementById('selfTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const selfList = currentUser.sd_self_list || [];
+
+      if (selfList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #777;">No self-assessments saved yet.</td></tr>`;
+        return;
+      }
+
+      selfList.forEach((item, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>#${index + 1}</strong></td>
+          <td><strong>${item.procedure}</strong></td>
+          <td>${item.expectations}</td>
+          <td>${item.gain}</td>
+          <td>${item.challenges}</td>
+          <td style="white-space: nowrap;">
+            <button class="btn-edit" onclick="editSelfAssessment(${item.id})">Edit</button>
+            <button class="btn-delete" onclick="deleteSelfAssessment(${item.id})">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function deleteSelfAssessment(id) {
+      if (confirm("Delete this self-assessment entry?")) {
+        currentUser.sd_self_list = (currentUser.sd_self_list || []).filter(s => s.id !== id);
+        saveUserData();
+        renderSelfAssessmentList();
+      }
+    }
+
+    function saveUserData() {
+      localStorage.setItem('rw_current_user', JSON.stringify(currentUser));
+      const allUsers = JSON.parse(localStorage.getItem('rw_registered_users')) || [];
+      const index = allUsers.findIndex(u => u.code === currentUser.code);
+      if (index !== -1) {
+        allUsers[index] = currentUser;
+        localStorage.setItem('rw_registered_users', JSON.stringify(allUsers));
+      }
+      // Trigger synchronization across files
+      syncOutboundData();
+    }
+
+    window.addEventListener('storage', (event) => {
+      if (!event.key || event.key.startsWith('rw_')) {
+        syncInboundData();
+        renderProfileInfo();
+        renderTasks();
+        renderSelfAssessmentList();
+        loadEvaluationInfo();
+        loadAcademicInfo();
+        updateQuickStats();
+        renderCertificate();
+      }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        syncInboundData();
+        renderTasks();
+        renderSelfAssessmentList();
+        loadEvaluationInfo();
+        loadAcademicInfo();
+      }
+    });
+
+    function logout() {
+      localStorage.removeItem('rw_current_user');
+      window.location.href = "HOMESCREEN.html";
+    }
+
+    function openEditProfileModal() {
+      try {
+        currentUser = JSON.parse(localStorage.getItem('rw_current_user'));
+      } catch (err) {
+        currentUser = currentUser || null;
+      }
+
+      if (!currentUser) {
+        alert("❌ Error: No active user session found. Please log in again.");
+        return;
+      }
+
+      const codeInput = document.getElementById('editCode');
+      const nameInput = document.getElementById('editName');
+      const schoolInput = document.getElementById('editSchool');
+      const tradeInput = document.getElementById('editTrade');
+
+      if (codeInput) codeInput.value = currentUser.code || currentUser.registrationCode || currentUser.userCode || '';
+      if (nameInput) nameInput.value = currentUser.fullName || currentUser.name || currentUser.userName || '';
+      if (schoolInput) schoolInput.value = currentUser.school || currentUser.schoolName || currentUser.userSchool || '';
+      if (tradeInput) tradeInput.value = currentUser.trade || currentUser.option || currentUser.userTrade || '';
+
+      const modal = document.getElementById('editProfileModal');
+      if (modal) {
+        modal.classList.add('active');
+        modal.style.display = 'flex';
+      }
+    }
+
+    function closeEditProfileModal() {
+      const modal = document.getElementById('editProfileModal');
+      if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+      }
+    }
+
+    function previewEditPassportPhoto(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          currentUser.photo = e.target.result;
+          currentUser.photoData = e.target.result;
+          currentUser.userPhoto = e.target.result;
+          document.getElementById('userPhoto').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function saveProfileChanges(e) {
+      e.preventDefault();
+
+      if (!currentUser) {
+        try {
+          currentUser = JSON.parse(localStorage.getItem('rw_current_user'));
+        } catch (err) {
+          currentUser = null;
+        }
+      }
+
+      if (!currentUser) {
+        alert("❌ Error: Active session missing. Please log in again.");
+        return;
+      }
+
+      const editNameElem = document.getElementById('editName');
+      const editSchoolElem = document.getElementById('editSchool');
+      const editTradeElem = document.getElementById('editTrade');
+
+      const newName = editNameElem ? editNameElem.value.trim() : '';
+      const newSchool = editSchoolElem ? editSchoolElem.value.trim() : '';
+      const newTrade = editTradeElem ? editTradeElem.value : '';
+
+      if (!newName || !newSchool || !newTrade) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      const userCode = currentUser.code || currentUser.registrationCode || currentUser.userCode;
+
+      currentUser.fullName = newName;
+      currentUser.name = newName;
+      currentUser.school = newSchool;
+      currentUser.schoolName = newSchool;
+      currentUser.userSchool = newSchool;
+      currentUser.trade = newTrade;
+      currentUser.option = newTrade;
+      currentUser.userTrade = newTrade;
+
+      let registeredUsers = [];
+      try {
+        registeredUsers = JSON.parse(localStorage.getItem('rw_registered_users')) || [];
+      } catch (err) {
+        registeredUsers = [];
+      }
+
+      if (Array.isArray(registeredUsers) && registeredUsers.length > 0) {
+        const userIndex = registeredUsers.findIndex(
+          u => u.code === userCode || u.registrationCode === userCode || u.userCode === userCode
+        );
+
+        if (userIndex !== -1) {
+          registeredUsers[userIndex].fullName = newName;
+          registeredUsers[userIndex].name = newName;
+          registeredUsers[userIndex].school = newSchool;
+          registeredUsers[userIndex].schoolName = newSchool;
+          registeredUsers[userIndex].userSchool = newSchool;
+          registeredUsers[userIndex].trade = newTrade;
+          registeredUsers[userIndex].option = newTrade;
+          registeredUsers[userIndex].userTrade = newTrade;
+          if (currentUser.photo) {
+            registeredUsers[userIndex].photo = currentUser.photo;
+            registeredUsers[userIndex].photoData = currentUser.photo;
+            registeredUsers[userIndex].userPhoto = currentUser.photo;
+          }
+          localStorage.setItem('rw_registered_users', JSON.stringify(registeredUsers));
+        }
+      }
+
+      saveUserData();
+      renderProfileInfo();
+      closeEditProfileModal();
+      alert("✅ Student Identification updated successfully!");
+    }
+  </script>
+</body>
+</html>
